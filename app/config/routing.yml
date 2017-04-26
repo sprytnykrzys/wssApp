@@ -1,6 +1,12 @@
 app:
     resource: '@AppBundle/Controller/'
     type: annotation
+login:
+    resource: '@AppBundle/LoginController/'
+    type: annotation
+register:
+    resource: '@AppBundle/Controller/RegisterController/'
+    type: annotation
 #app:
 #    resource: "@AppBundle/Controller/DefaultController.php"
 #    type:     annotation

@@ -1,0 +1,32 @@
+AppBundle\Entity\Product:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\ProductRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        code:
+            type: string
+            length: '64'
+        exportCode:
+            type: string
+            length: '64'
+            column: export_code
+        price:
+            type: float
+        currency:
+            type: string
+            length: '16'
+        measureUnit:
+            type: string
+            length: '16'
+            column: measure_unit
+            nullable: true
+        creationDate:
+            type: datetime
+            column: creation_date
+    lifecycleCallbacks: {  }

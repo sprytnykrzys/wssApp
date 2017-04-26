@@ -1,0 +1,17 @@
+AppBundle\Entity\ItemType:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\ItemTypeRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        itemName:
+            type: string
+            length: '32'
+            column: item_name
+            nullable: true
+    lifecycleCallbacks: {  }

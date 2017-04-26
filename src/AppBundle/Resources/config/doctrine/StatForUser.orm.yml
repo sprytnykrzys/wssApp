@@ -1,0 +1,22 @@
+AppBundle\Entity\StatForUser:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\StatForUserRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        idUser:
+            type: integer
+            column: id_user
+        loginCount:
+            type: integer
+            nullable: true
+            column: login_count
+        generatedOffersCount:
+            type: integer
+            column: generated_offers_count
+    lifecycleCallbacks: {  }

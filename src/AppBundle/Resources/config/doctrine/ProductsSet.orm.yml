@@ -1,0 +1,27 @@
+AppBundle\Entity\ProductsSet:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\ProductsSetRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        number:
+            type: string
+            length: '64'
+        type:
+            type: string
+            length: '64'
+        idSystem:
+            type: integer
+            column: id_system
+        idSystemProvider:
+            type: integer
+            column: id_system_provider
+        creationDate:
+            type: datetime
+            column: creation_date
+    lifecycleCallbacks: {  }

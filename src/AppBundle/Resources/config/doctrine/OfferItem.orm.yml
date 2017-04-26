@@ -1,0 +1,16 @@
+AppBundle\Entity\OfferItem:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\OfferItemRepository
+    id:
+        idOffer:
+            type: integer
+            column: id_offer
+            id: true
+        idItem:
+            type: integer
+            column: id_item
+        idItemType:
+            type: integer
+            column: id_item_type
+    lifecycleCallbacks: {  }

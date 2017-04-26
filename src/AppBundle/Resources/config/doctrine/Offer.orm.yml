@@ -1,0 +1,21 @@
+AppBundle\Entity\Offer:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\OfferRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: '128'
+        idUser:
+            type: integer
+            column: id_user
+        creationDate:
+            type: datetime
+            column: creation_date
+    lifecycleCallbacks: {  }

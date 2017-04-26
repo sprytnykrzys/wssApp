@@ -2,6 +2,8 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * User
  */
@@ -13,14 +15,14 @@ class User
     private $id;
 
     /**
-     * @var string
+     * @var int
      */
-    private $email;
+    private $idCompany;
 
     /**
      * @var string
      */
-    private $password;
+    private $email;
 
     /**
      * @var string
@@ -30,33 +32,43 @@ class User
     /**
      * @var string
      */
+    private $discount;
+
+    /**
+     * @var string
+     */
+    private $password;
+
+    /**
+     * @var \DateTime
+     */
+    private $lastLogin;
+
+    /**
+     * @var string
+     */
     private $token;
 
     /**
      * @var \DateTime
      */
-    private $updated;
-
-    /**
-     * @var \DateTime
-     */
-    private $created;
-
-    /**
-     * @var \DateTime
-     */
-    private $token_exp_time;
+    private $tokenExpTime;
 
     /**
      * @var string
      */
-    private $last_host;
+    private $lastHost;
+
+    /**
+     * @var \DateTime
+     */
+    private $creationDate;
 
 
     /**
      * Get id
      *
-     * @return int
+     * @return integer 
      */
     public function getId()
     {
@@ -64,10 +76,32 @@ class User
     }
 
     /**
+     * Set idCompany
+     *
+     * @param integer $idCompany
+     * @return User
+     */
+    public function setIdCompany($idCompany)
+    {
+        $this->idCompany = $idCompany;
+
+        return $this;
+    }
+
+    /**
+     * Get idCompany
+     *
+     * @return integer 
+     */
+    public function getIdCompany()
+    {
+        return $this->idCompany;
+    }
+
+    /**
      * Set email
      *
      * @param string $email
-     *
      * @return User
      */
     public function setEmail($email)
@@ -80,7 +114,7 @@ class User
     /**
      * Get email
      *
-     * @return string
+     * @return string 
      */
     public function getEmail()
     {
@@ -88,33 +122,9 @@ class User
     }
 
     /**
-     * Set password
-     *
-     * @param string $password
-     *
-     * @return User
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-        return $this;
-    }
-
-    /**
-     * Get password
-     *
-     * @return string
-     */
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    /**
      * Set role
      *
      * @param string $role
-     *
      * @return User
      */
     public function setRole($role)
@@ -127,7 +137,7 @@ class User
     /**
      * Get role
      *
-     * @return string
+     * @return string 
      */
     public function getRole()
     {
@@ -135,10 +145,78 @@ class User
     }
 
     /**
+     * Set discount
+     *
+     * @param string $discount
+     * @return User
+     */
+    public function setDiscount($discount)
+    {
+        $this->discount = $discount;
+
+        return $this;
+    }
+
+    /**
+     * Get discount
+     *
+     * @return string 
+     */
+    public function getDiscount()
+    {
+        return $this->discount;
+    }
+
+    /**
+     * Set password
+     *
+     * @param string $password
+     * @return User
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Get password
+     *
+     * @return string 
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * Set lastLogin
+     *
+     * @param \DateTime $lastLogin
+     * @return User
+     */
+    public function setLastLogin($lastLogin)
+    {
+        $this->lastLogin = $lastLogin;
+
+        return $this;
+    }
+
+    /**
+     * Get lastLogin
+     *
+     * @return \DateTime 
+     */
+    public function getLastLogin()
+    {
+        return $this->lastLogin;
+    }
+
+    /**
      * Set token
      *
      * @param string $token
-     *
      * @return User
      */
     public function setToken($token)
@@ -151,7 +229,7 @@ class User
     /**
      * Get token
      *
-     * @return string
+     * @return string 
      */
     public function getToken()
     {
@@ -159,98 +237,71 @@ class User
     }
 
     /**
-     * Set updated
+     * Set tokenExpTime
      *
-     * @param \DateTime $updated
-     *
+     * @param \DateTime $tokenExpTime
      * @return User
      */
-    public function setUpdated($updated)
+    public function setTokenExpTime($tokenExpTime)
     {
-        $this->updated = $updated;
+        $this->tokenExpTime = $tokenExpTime;
 
         return $this;
     }
 
     /**
-     * Get updated
+     * Get tokenExpTime
      *
-     * @return \DateTime
-     */
-    public function getUpdated()
-    {
-        return $this->updated;
-    }
-
-    /**
-     * Set created
-     *
-     * @param \DateTime $created
-     *
-     * @return User
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
-
-        return $this;
-    }
-
-    /**
-     * Get created
-     *
-     * @return \DateTime
-     */
-    public function getCreated()
-    {
-        return $this->created;
-    }
-
-    /**
-     * Set token_exp_time
-     *
-     * @param \DateTime $token_exp_time
-     *
-     * @return User
-     */
-    public function setTokenExpTime($token_exp_time)
-    {
-        $this->token_exp_time = $token_exp_time;
-
-        return $this;
-    }
-
-    /**
-     * Get created
-     *
-     * @return \DateTime
+     * @return \DateTime 
      */
     public function getTokenExpTime()
     {
-        return $this->token_exp_time;
+        return $this->tokenExpTime;
     }
 
     /**
-     * Set last_host
+     * Set lastHost
      *
-     * @param string $last_host
-     *
+     * @param string $lastHost
      * @return User
      */
-    public function setLastHost($last_host)
+    public function setLastHost($lastHost)
     {
-        $this->last_host = $last_host;
+        $this->lastHost = $lastHost;
+
         return $this;
     }
 
     /**
-     * Get token
+     * Get lastHost
      *
-     * @return string
+     * @return string 
      */
     public function getLastHost()
     {
-        return $this->last_host;
+        return $this->lastHost;
+    }
+
+    /**
+     * Set creationDate
+     *
+     * @param \DateTime $creationDate
+     * @return User
+     */
+    public function setCreationDate($creationDate)
+    {
+        $this->creationDate = $creationDate;
+
+        return $this;
+    }
+
+    /**
+     * Get creationDate
+     *
+     * @return \DateTime 
+     */
+    public function getCreationDate()
+    {
+        return $this->creationDate;
     }
 }
-

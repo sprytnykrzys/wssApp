@@ -1,0 +1,13 @@
+AppBundle\Entity\ProductsSetProduct:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\ProductsSetProductRepository
+    id:
+        idProductSet:
+            type: integer
+            column: id_product_set
+            id: true
+        idProduct:
+            type: integer
+            column: id_product
+    lifecycleCallbacks: {  }
