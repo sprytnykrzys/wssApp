@@ -9,9 +9,10 @@ AppBundle\Entity\User:
             generator:
                 strategy: AUTO
     fields:
-        idCompany:
+        idClient:
             type: integer
             column: id_company
+            nullable: true
         email:
             type: string
             length: 255
@@ -28,6 +29,7 @@ AppBundle\Entity\User:
         lastLogin:
             type: datetime
             column: last_login
+            nullable: true
         token:
             type: string
             length: '128'

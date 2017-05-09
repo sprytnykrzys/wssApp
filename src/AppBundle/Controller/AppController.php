@@ -8,6 +8,7 @@ use AppBundle\Entity\User;
 
 trait AppController
 {
+    protected $DEBUG = true;
     /*
      * Token lifetime in hours
      */
@@ -22,14 +23,21 @@ trait AppController
     protected $salt         =   "9446979846cu4vj9d8fcgbzda9fy4nw46958bh4kiiut9iyp";
     protected $saltPasswd   =   "0023m4nfx90ayr7tyq2ERteEDFazsdfaubsdofasadfuycbu";
 
+    /* user object necessary to check privileges */
+    protected $user = null;
+
     /* create & update fields */
     protected $expectedParameters = array();
     protected $entityObject = null;
+    protected $authenticated = false;
 
     /* file management essentials */
     protected $webDir = null;
 
     protected function authenticate($authenticate = true){
+        if($this->DEBUG || $this->authenticated){
+            return true;
+        }
         $this->initializeControllerUtilityFields();
         if(!$authenticate){
             return true;
@@ -56,9 +64,25 @@ trait AppController
             $this->response['errors'][] = 'Authentication required. Token out of date.';
             return false;
         }
+        $this->user = $user;
         $this->response['uid'] = $user->getId();
         $this->response['token'] = $this->generateTokenAndUpdate($user);
+        /* multiple authentication protection */
+        $this->authenticated = true;
         return true;
+    }
+    protected function isAdmin(){
+        if($this->DEBUG){
+            return true;
+        }
+        return !is_null($this->user) && is_object($this->user) && $this->user->getRole() == 'ADMIN';
+    }
+    public function tooFewPrivilegesResponse(){
+        $view = $this->view(array_merge($this->getResponse(), array(
+            'hasError' => 1,
+            'errors' => ['too few privileges to do this operation']
+        )), 403, $this->corsHeaders);
+        return $this->handleView($view);
     }
     private function applyCORSHeaders(){
         foreach ($this->corsHeaders as $name => $val){
@@ -68,6 +92,10 @@ trait AppController
     }
     public function prepareAuthRequiredResponse(){
         $view = $this->view($this->getResponse(), 403, $this->corsHeaders);
+        return $this->handleView($view);
+    }
+    public  function fastResponse($params, $code){
+        $view = $this->view($params, $code, $this->corsHeaders);
         return $this->handleView($view);
     }
     /* Entity update related */

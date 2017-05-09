@@ -17,7 +17,7 @@ class User
     /**
      * @var int
      */
-    private $idCompany;
+    private $idClient;
 
     /**
      * @var string
@@ -76,26 +76,26 @@ class User
     }
 
     /**
-     * Set idCompany
+     * Set idClient
      *
-     * @param integer $idCompany
+     * @param integer $idClient
      * @return User
      */
-    public function setIdCompany($idCompany)
+    public function setIdClient($idClient)
     {
-        $this->idCompany = $idCompany;
+        $this->idClient = $idClient;
 
         return $this;
     }
 
     /**
-     * Get idCompany
+     * Get idClient
      *
      * @return integer 
      */
-    public function getIdCompany()
+    public function getIdClient()
     {
-        return $this->idCompany;
+        return $this->idClient;
     }
 
     /**
@@ -129,7 +129,7 @@ class User
      */
     public function setRole($role)
     {
-        $this->role = $role;
+        $this->role = mb_convert_case($role,  MB_CASE_UPPER);
 
         return $this;
     }
@@ -303,5 +303,11 @@ class User
     public function getCreationDate()
     {
         return $this->creationDate;
+    }
+
+    /* Custom user methods */
+
+    public function updateUserStats(){
+
     }
 }
