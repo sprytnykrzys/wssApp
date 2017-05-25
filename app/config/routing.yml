@@ -10,3 +10,12 @@ app:
 client:
     resource: "@AppBundle/Controller/ClientController.php"
     type:     annotation
+product:
+    resource: "@AppBundle/Controller/ProductController.php"
+    type:     annotation
+hierarchy:
+    resource: "@AppBundle/Controller/HierarchyController.php"
+    type:     annotation
+test:
+    resource: "@AppBundle/Controller/TestController.php"
+    type:     annotation

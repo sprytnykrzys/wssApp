@@ -1,7 +1,7 @@
-AppBundle\Entity\Offer:
+AppBundle\Entity\Hierarchy:
     type: entity
     table: null
-    repositoryClass: AppBundle\Repository\OfferRepository
+    repositoryClass: AppBundle\Repository\HierarchyRepository
     id:
         id:
             type: integer
@@ -9,12 +9,14 @@ AppBundle\Entity\Offer:
             generator:
                 strategy: AUTO
     fields:
+        idParent:
+            type: integer
+            column: id_parent
         name:
             type: text
-            length: '128'
-        idUser:
+            length: 255
+        level:
             type: integer
-            column: id_user
         creationDate:
             type: datetime
             column: creation_date

@@ -10,7 +10,14 @@ class UserRepository extends EntityRepository
     {
         return $this->getEntityManager()
             ->createQuery(
-                'SELECT p FROM AppBundle:User u ORDER BY u.id ASC'
+                'SELECT u FROM AppBundle:User u ORDER BY u.id ASC'
+            )
+            ->getResult();
+    }
+    public function findAllClients(){
+        return $this->getEntityManager()
+            ->createQuery(
+                'SELECT u FROM AppBundle:User u WHERE UPPER(u.role) NOT LIKE \'ADMIN\' ORDER BY u.id ASC'
             )
             ->getResult();
     }

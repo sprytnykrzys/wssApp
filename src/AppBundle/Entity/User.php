@@ -152,7 +152,7 @@ class User
      */
     public function setDiscount($discount)
     {
-        $this->discount = $discount;
+        $this->discount = base64_encode($discount);
 
         return $this;
     }
@@ -164,7 +164,7 @@ class User
      */
     public function getDiscount()
     {
-        return $this->discount;
+        return base64_decode($this->discount);
     }
 
     /**

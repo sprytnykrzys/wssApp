@@ -35,6 +35,7 @@ trait AppController
     protected $webDir = null;
 
     protected function authenticate($authenticate = true){
+        $this->request = Request::createFromGlobals();
         if($this->DEBUG || $this->authenticated){
             return true;
         }
@@ -43,12 +44,11 @@ trait AppController
             return true;
         }
         //$this->applyCORSHeaders();
-        $this->request = Request::createFromGlobals();
         $ip = $this->request->getClientIp();
 
         $dataJSON = $this->getJSONRequest();
-        $uid = isset($dataJSON['uid']) ? $dataJSON['uid'] : $this->request->get('uid');
-        $token = isset($dataJSON['token']) ? $dataJSON['token'] : $this->request->get('token');
+        $uid = isset($dataJSON['auth']['uid']) ? $dataJSON['uid'] : $this->request->get('uid');
+        $token = isset($dataJSON['auth']['token']) ? $dataJSON['token'] : $this->request->get('token');
         
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository('AppBundle\Entity\User')->getByAuthData($uid, $token, $ip);
@@ -65,8 +65,9 @@ trait AppController
             return false;
         }
         $this->user = $user;
-        $this->response['uid'] = $user->getId();
-        $this->response['token'] = $this->generateTokenAndUpdate($user);
+        $this->response['auth'] = array();
+        $this->response['auth']['uid'] = $user->getId();
+        $this->response['auth']['token'] = $this->generateTokenAndUpdate($user);
         /* multiple authentication protection */
         $this->authenticated = true;
         return true;
@@ -94,7 +95,17 @@ trait AppController
         $view = $this->view($this->getResponse(), 403, $this->corsHeaders);
         return $this->handleView($view);
     }
-    public  function fastResponse($params, $code){
+    public  function fastResponse($params = null, $code = 200){
+        if(is_null($params)){
+            $params = $this->getResponse();
+        }
+        else{
+            $params = array_merge(
+                $this->getResponse(),
+                $params
+            );
+        }
+
         $view = $this->view($params, $code, $this->corsHeaders);
         return $this->handleView($view);
     }

@@ -10,7 +10,7 @@ AppBundle\Entity\System:
                 strategy: AUTO
     fields:
         name:
-            type: string
+            type: text
             length: 255
         idSystemProvider:
             type: integer

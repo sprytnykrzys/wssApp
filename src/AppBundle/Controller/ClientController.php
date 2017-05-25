@@ -13,6 +13,25 @@ class ClientController extends FOSRestController
 {
     use AppController;
     const KEY = 'rmuwt6546wel4t65';
+
+    /* compatibility workaround */
+    /**
+     * @Route("/client/delete")
+     * @Method({"POST"})
+     */
+    public function postDeleteGetAction(){
+        return $this->deleteGetAction();
+    }
+
+    /* compatibility workaround */
+    /**
+     * @Route("/client/{id}/delete")
+     * @Method({"POST"})
+     */
+    public function postDeleteAction($id = null){
+        return $this->deleteAction($id);
+    }
+
     /**
      * @Route("/client")
      * @Method({"POST"})
@@ -73,7 +92,7 @@ class ClientController extends FOSRestController
 
         return $this->fastResponse([
             'success' => 1,
-            'client' => $this->preparedClientObject($client),
+            'client' => $this->prepareClientObject($client),
             'message' => array(
                 'client added successfully'
             )
@@ -122,6 +141,7 @@ class ClientController extends FOSRestController
         }
 
     }
+
     /**
      * @Route("/client")
      * @Method({"DELETE"})
@@ -136,6 +156,8 @@ class ClientController extends FOSRestController
         $id = isset($dataJSON['id']) ? $dataJSON['id'] : $request->get('id');
         return $this->deleteAction($id);
     }
+
+
     /**
      * @Route("/client/{id}/")
      * @Method({"DELETE"})

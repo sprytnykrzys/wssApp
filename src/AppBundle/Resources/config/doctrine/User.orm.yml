@@ -20,7 +20,7 @@ AppBundle\Entity\User:
             type: string
             length: '32'
         discount:
-            type: string
+            type: text
             length: '32'
             nullable: true
         password:

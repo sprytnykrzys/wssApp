@@ -10,7 +10,7 @@ AppBundle\Entity\ItemType:
                 strategy: AUTO
     fields:
         itemName:
-            type: string
+            type: text
             length: '32'
             column: item_name
             nullable: true

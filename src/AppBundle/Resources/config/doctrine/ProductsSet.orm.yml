@@ -10,10 +10,10 @@ AppBundle\Entity\ProductsSet:
                 strategy: AUTO
     fields:
         number:
-            type: string
+            type: text
             length: '64'
         type:
-            type: string
+            type: text
             length: '64'
         idSystem:
             type: integer

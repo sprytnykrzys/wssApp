@@ -43,6 +43,8 @@ class RegisterController extends FOSRestController
         $email = isset($dataJSON['email']) ? $dataJSON['email'] : $request->get('email');
         $password =  isset($dataJSON['password']) ? $dataJSON['password'] : $request->get('password');
         $role =  isset($dataJSON['role']) ? $dataJSON['role'] : $request->get('role');
+        $id_client = isset($dataJSON['id_client']) ? $dataJSON['id_client'] : $request->get('id_client');
+
         if(isset($role)){
             $role = mb_convert_case($role,  MB_CASE_UPPER);
         }
@@ -68,6 +70,11 @@ class RegisterController extends FOSRestController
             $user->setToken( "00000000000000000000000000000000000000000" );
             $user->setLastHost( "127.0.0.1" );
             $user->setLastLogin( $now );
+
+            if(!is_null($id_client)){
+                /* TODO: dodac walidacje czy klient istnieje */
+                $user->setIdClient($id_client);
+            }
 
             $em->persist($user);
             if( !$em->flush() ){
@@ -124,6 +131,7 @@ class RegisterController extends FOSRestController
         $password = isset($dataJSON['password']) ? $dataJSON['password'] : $request->get('password');
         $role = isset($dataJSON['role']) ? $dataJSON['role'] : $request->get('role');
         $discount = isset($dataJSON['discount']) ? $dataJSON['discount'] : $request->get('discount');
+        $id_client = isset($dataJSON['id_client']) ? $dataJSON['id_client'] : $request->get('id_client');
 
         if(!is_null($uid)){
             $em = $this->getDoctrine()->getManager();
@@ -142,6 +150,12 @@ class RegisterController extends FOSRestController
                 if(!is_null($discount)){
                     $user->setDiscount($discount);
                 }
+                if(!is_null($id_client)){
+                    /* TODO: dodac walidacje czy klient istnieje */
+                    $user->setIdClient($id_client);
+                }
+
+
                 $em->persist($user);
                 $em->flush();
                 return $this->fastResponse(array(
@@ -172,7 +186,7 @@ class RegisterController extends FOSRestController
         }
         else{
             $em = $this->getDoctrine()->getManager();
-            $users = $em->getRepository('AppBundle\Entity\User')->findAll();
+            $users = $em->getRepository('AppBundle\Entity\User')->findAllClients();
 
             return $this->fastResponse(array(
                 'users' => $this->prepareUserObjects($users)
@@ -264,6 +278,7 @@ class RegisterController extends FOSRestController
             return array(
                 'uid' => $obj->getId(),
                 'email' => $obj->getEmail(),
+                'id_client' => $obj->getIdClient(),
                 'role' => $obj->getRole(),
                 'discount' => $obj->getDiscount(),
                 'last_login' => $obj->getLastLogin()

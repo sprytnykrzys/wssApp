@@ -10,19 +10,19 @@ AppBundle\Entity\Product:
                 strategy: AUTO
     fields:
         code:
-            type: string
+            type: text
             length: '64'
         exportCode:
-            type: string
+            type: text
             length: '64'
             column: export_code
         price:
             type: float
         currency:
-            type: string
+            type: text
             length: '16'
         measureUnit:
-            type: string
+            type: text
             length: '16'
             column: measure_unit
             nullable: true
