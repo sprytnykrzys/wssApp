@@ -1,0 +1,21 @@
+AppBundle\Entity\Client:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\ClientRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        discount:
+            type: text
+            length: '32'
+            nullable: true
+        creationDate:
+            type: datetime
+        name:
+            type: text
+            length: 255
+    lifecycleCallbacks: {  }
