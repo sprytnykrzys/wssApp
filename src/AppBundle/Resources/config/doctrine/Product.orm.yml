@@ -16,6 +16,9 @@ AppBundle\Entity\Product:
             type: text
             length: '64'
             column: export_code
+        name:
+            type: text
+            length: '64'
         price:
             type: float
         currency:

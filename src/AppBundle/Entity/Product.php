@@ -25,6 +25,11 @@ class Product
     private $exportCode;
 
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
      * @var float
      */
     private $price;
@@ -99,6 +104,29 @@ class Product
     public function getExportCode()
     {
         return $this->exportCode;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return Product
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**

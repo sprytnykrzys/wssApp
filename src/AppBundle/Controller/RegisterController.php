@@ -229,6 +229,14 @@ class RegisterController extends FOSRestController
         return $this->deleteAction($uid);
     }
     /**
+     * @Route("/user/{uid}/delete/")
+     * @Method({"POST"})
+     */
+
+    public function postDeleteAction($uid = null){
+        return $this->deleteAction($uid);
+    }
+    /**
      * @Route("/user/{uid}/")
      * @Method({"DELETE"})
      */

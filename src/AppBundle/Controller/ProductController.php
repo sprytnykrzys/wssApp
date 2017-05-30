@@ -72,6 +72,7 @@ class ProductController extends FOSRestController
         $price = isset($dataJSON['product']['price']) ? $dataJSON['product']['price'] : $request->get('price');
         $currency = isset($dataJSON['product']['currency']) ? $dataJSON['product']['currency'] : $request->get('currency');
         $measure_unit = isset($dataJSON['product']['measure_unit']) ? $dataJSON['product']['measure_unit'] : $request->get('measure_unit');
+        $name = isset($dataJSON['product']['name']) ? $dataJSON['product']['name'] : $request->get('name');
         //$creation_date = isset($dataJSON['product']['creation_date']) ? $dataJSON['product']['creation_date'] : $request->get('creation_date');
 
         if(!is_null($code)){
@@ -107,6 +108,15 @@ class ProductController extends FOSRestController
         else{
             if(!$product->getCurrency()){
                 $this->errorPush( 'Currency is required', 'currency');
+            }
+        }
+
+        if(!is_null($name)){
+            $product->setName($name);
+        }
+        else{
+            if(!$product->getName()){
+                $this->errorPush( 'Name is required', 'name');
             }
         }
 
@@ -169,6 +179,14 @@ class ProductController extends FOSRestController
     }
 
     /**
+     * @Route("/product/delete")
+     * @Method({"DELETE"})
+     */
+    public function deleteGetPostAction(){
+        return $this->deleteGetAction();
+    }
+
+    /**
      * @Route("/product")
      * @Method({"DELETE"})
      */
@@ -185,7 +203,13 @@ class ProductController extends FOSRestController
         $id = isset($dataJSON['id']) ? $dataJSON['id'] : $request->get('id');
         return $this->deleteAction($id);
     }
-
+    /**
+     * @Route("/product/{product_id}/delete/")
+     * @Method({"POST"})
+     */
+    public function deletePostAction($product_id = null){
+        return $this->deleteAction($product_id);
+    }
     /**
      * @Route("/product/{product_id}/")
      * @Method({"DELETE"})
@@ -242,6 +266,7 @@ class ProductController extends FOSRestController
                 'id' => $obj->getId(),
                 'code' => $obj->getCode(),
                 'export_code' => $obj->getExportCode(),
+                'name' => $obj->getName(),
                 'price' => $obj->getPrice(),
                 'currency' => $obj->getCurrency(),
                 'measure_unit' => $obj->getMeasureUnit(),
