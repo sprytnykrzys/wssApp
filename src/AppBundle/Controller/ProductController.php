@@ -73,6 +73,7 @@ class ProductController extends FOSRestController
         $currency = isset($dataJSON['product']['currency']) ? $dataJSON['product']['currency'] : $request->get('currency');
         $measure_unit = isset($dataJSON['product']['measure_unit']) ? $dataJSON['product']['measure_unit'] : $request->get('measure_unit');
         $name = isset($dataJSON['product']['name']) ? $dataJSON['product']['name'] : $request->get('name');
+        $image = isset($dataJSON['product']['image']) ? $dataJSON['product']['image'] : $this->request->get('image');
         //$creation_date = isset($dataJSON['product']['creation_date']) ? $dataJSON['product']['creation_date'] : $request->get('creation_date');
 
         if(!is_null($code)){

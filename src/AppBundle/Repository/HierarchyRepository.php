@@ -37,7 +37,7 @@ class HierarchyRepository extends EntityRepository
             )
             ->getResult();
     }
-    public function findAllNested($hierarchyElements, $start = 0)
+    public function findAllNested($hierarchyElements, $start = 0, &$unassigned = null)
     {
         $tree = array();
         foreach ($hierarchyElements as $node) {
@@ -46,7 +46,21 @@ class HierarchyRepository extends EntityRepository
             $this->parentNodeIds[$node['id']] = $node['id_parent'];
             $this->nodesById[$node['id']] = $node;
         }
+        if($start == 0){
+            $rootLevel = 0;
+        }
+        else{
+            $rootLevel = $this->nodesById[$start]['level'];
+        }
         $this->buildTreeRecursive($start, $tree);
+        if(!is_null($unassigned)){
+            foreach ($tree['subhierarchyElements'] as $key => $node){
+                if($node['level'] != $rootLevel){
+                    $unassigned[$key] = $node;
+                    unset($tree['subhierarchyElements'][$key]);
+                }
+            }
+        }
         return $tree['subhierarchyElements'];
     }
     /* helper methods */
