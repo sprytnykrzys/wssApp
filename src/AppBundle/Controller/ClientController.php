@@ -211,7 +211,8 @@ class ClientController extends FOSRestController
             return array(
                 'id' => $obj->getId(),
                 'name' => $obj->getName(),
-                'discount' => $obj->getDiscount()
+                'discount' => $obj->getDiscount(),
+                'creation_date' => $obj->getCreationDate(),
             );
         }
         else{

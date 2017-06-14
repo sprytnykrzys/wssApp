@@ -19,3 +19,6 @@ hierarchy:
 test:
     resource: "@AppBundle/Controller/TestController.php"
     type:     annotation
+product_set:
+    resource: "@AppBundle/Controller/ProductSetController.php"
+    type:     annotation

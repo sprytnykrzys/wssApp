@@ -2,7 +2,7 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Product;
+use AppBundle\Entity\ProductsSet;
 use AppBundle\Controller\AppController as AppController;
 use FOS\RestBundle\Controller\FOSRestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -10,13 +10,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 
 
-class ProductController extends FOSRestController
+class ProductSetController extends FOSRestController
 {
     use AppController;
 
 
     /**
-     * @Route("/product")
+     * @Route("/products_set")
      * @Method({"POST"})
      */
     public function addProductAction()
@@ -32,16 +32,16 @@ class ProductController extends FOSRestController
 
         $dataJSON = $this->getJSONRequest();
 
-        $id = isset($dataJSON['product']['id']) ? $dataJSON['product']['id'] : $request->get('id');
+        $id = isset($dataJSON['products_set']['id']) ? $dataJSON['products_set']['id'] : $request->get('id');
 
         return $this->updateProductAction($id);
     }
 
     /**
-     * @Route("/product/{product_id}/")
+     * @Route("/products_set/{products_set_id}/")
      * @Method({"POST"})
      */
-    public function updateProductAction($product_id = null){
+    public function updateProductAction($products_set_id = null){
         if( !$this->authenticate()){
             return $this->prepareAuthRequiredResponse();
         }
@@ -55,76 +55,59 @@ class ProductController extends FOSRestController
 
         $dataJSON = $this->getJSONRequest();
 
-        if(!is_null($product_id)){
-            $product = $em->getRepository('AppBundle\Entity\Product')->find($product_id);
+        if(!is_null($products_set_id)){
+            $product = $em->getRepository('AppBundle\Entity\ProductsSet')->find($products_set_id);
             if(!is_object($product)){
-                $product = new Product();
+                $product = new ProductsSet();
                 $new = true;
             }
         }
         else{
-            $product = new Product();
+            $product = new ProductsSet();
             $new = true;
         }
 
-        $code = isset($dataJSON['product']['code']) ? $dataJSON['product']['code'] : $request->get('code');
-        $export_code = isset($dataJSON['product']['export_code']) ? $dataJSON['product']['export_code'] : $request->get('export_code');
-        $price = isset($dataJSON['product']['price']) ? $dataJSON['product']['price'] : $request->get('price');
-        $currency = isset($dataJSON['product']['currency']) ? $dataJSON['product']['currency'] : $request->get('currency');
-        $measure_unit = isset($dataJSON['product']['measure_unit']) ? $dataJSON['product']['measure_unit'] : $request->get('measure_unit');
-        $name = isset($dataJSON['product']['name']) ? $dataJSON['product']['name'] : $request->get('name');
-        $id_system = isset($dataJSON['product']['id_system']) ? $dataJSON['product']['id_system'] : $request->get('id_system');
-        $image = isset($dataJSON['product']['image']) ? $dataJSON['product']['image'] : $this->request->get('image');
+        $number = isset($dataJSON['products_set']['number']) ? $dataJSON['products_set']['number'] : $request->get('number');
+        $type = isset($dataJSON['products_set']['type']) ? $dataJSON['products_set']['type'] : $request->get('type');
+        $id_system = isset($dataJSON['products_set']['id_system']) ? $dataJSON['products_set']['id_system'] : $request->get('id_system');
+        $products = isset($dataJSON['products_set']['products']) ? $dataJSON['products_set']['products'] : $request->get('products');
         //$creation_date = isset($dataJSON['product']['creation_date']) ? $dataJSON['product']['creation_date'] : $request->get('creation_date');
 
-        if(!is_null($code)){
-            $product->setCode($code);
+
+
+        if(!is_null($number)){
+            $product->setNumber($number);
         }
         else{
-            if(!$product->getCode()){
-                $this->errorPush( 'Code is required', 'code');
+            if(!$product->getNumber()){
+                $this->errorPush( 'Number is required', 'number');
             }
         }
 
-        if(!is_null($export_code)){
-            $product->setExportCode($export_code);
+        if(!is_null($type)){
+            $product->setType($type);
         }
         else{
-            if(!$product->getExportCode()){
-                $this->errorPush( 'Export code is required', 'export_code');
+            if(!$product->getType()){
+                $this->errorPush( 'Type is required', 'type');
             }
         }
 
-        if(!is_null($price)){
-            $product->setPrice($price);
+        if(!is_null($id_system)){
+            $product->setIdSystem($id_system);
         }
         else{
-            if(!$product->getPrice()){
-                $this->errorPush( 'Price is required', 'price');
+            if(!$product->getIdSystem()){
+                $this->errorPush( 'id_system is required', 'id_system');
             }
         }
 
-        if(!is_null($currency)){
-            $product->setCurrency($currency);
-        }
-        else{
-            if(!$product->getCurrency()){
-                $this->errorPush( 'Currency is required', 'currency');
-            }
+        $coll = array();
+        if(is_array($products)){
+            $coll = $em->getRepository('AppBundle\Entity\Product')->findByIds( $products );
+            $product->setProducts($coll);
         }
 
-        if(!is_null($name)){
-            $product->setName($name);
-        }
-        else{
-            if(!$product->getName()){
-                $this->errorPush( 'Name is required', 'name');
-            }
-        }
-
-        if(!is_null($measure_unit)){
-            $product->setMeasureUnit($measure_unit);
-        }
 
         if($new){
             $dateNow = new \DateTime("now");
@@ -142,7 +125,8 @@ class ProductController extends FOSRestController
 
         return $this->fastResponse([
             'success' => 1,
-            'product' => $this->prepareProductObjects($product),
+            'product' => $this->prepareProductsSetObjects($product),
+            'coll' => $coll,
             'message' => array(
                 $new ? 'product added successfully' : 'product updated successfully'
             )
@@ -151,37 +135,37 @@ class ProductController extends FOSRestController
 
 
     /**
-     * @Route("/product")
+     * @Route("/products_set")
      * @Method({"GET"})
      */
-    public function getProductsAction()
+    public function getProductsSetAction()
     {
         $em = $this->getDoctrine()->getManager();
-        $products = $em->getRepository('AppBundle\Entity\Product')->findAll();
+        $products = $em->getRepository('AppBundle\Entity\ProductsSet')->findAll();
 
         return $this->fastResponse([
             'success' => 1,
-            'products' => $products
+            'products_sets' => $products
         ] , 200);
     }
 
     /**
-     * @Route("/product/{product_id}/")
+     * @Route("/products_set/{product_id}/")
      * @Method({"GET"})
      */
-    public function getProductAction($product_id)
+    public function getProductAction($products_set_id)
     {
         $em = $this->getDoctrine()->getManager();
-        $product = $em->getRepository('AppBundle\Entity\Product')->find($product_id);
+        $product = $em->getRepository('AppBundle\Entity\ProductsSet')->find($products_set_id);
 
         return $this->fastResponse([
             'success' => 1,
-            'product' => $this->prepareProductObject($product),
+            'products_set' => $this->prepareProductsSetObject($product),
         ] , 200);
     }
 
     /**
-     * @Route("/product/delete")
+     * @Route("/products_set/delete")
      * @Method({"DELETE"})
      */
     public function deleteGetPostAction(){
@@ -189,7 +173,7 @@ class ProductController extends FOSRestController
     }
 
     /**
-     * @Route("/product")
+     * @Route("/products_set")
      * @Method({"DELETE"})
      */
     public function deleteGetAction(){
@@ -206,14 +190,14 @@ class ProductController extends FOSRestController
         return $this->deleteAction($id);
     }
     /**
-     * @Route("/product/{product_id}/delete/")
+     * @Route("/products_set/{product_id}/delete/")
      * @Method({"POST"})
      */
     public function deletePostAction($product_id = null){
         return $this->deleteAction($product_id);
     }
     /**
-     * @Route("/product/{product_id}/")
+     * @Route("/products_set/{product_id}/")
      * @Method({"DELETE"})
      */
     public function deleteAction($product_id = null){
@@ -225,36 +209,36 @@ class ProductController extends FOSRestController
         }
         if(!is_null($product_id)){
             $em = $this->getDoctrine()->getManager();
-            $product = $em->getRepository('AppBundle\Entity\Product')->find($product_id);
+            $product = $em->getRepository('AppBundle\Entity\ProductsSet')->find($product_id);
             if(is_object($product)){
                 $em->remove( $product );
                 $em->flush();
 
                 $this->response['success'] = 1;
-                $this->response['message'] = 'Product with ID = '. $product_id .' has been removed';
+                $this->response['message'] = 'Products set with ID = '. $product_id .' has been removed';
                 return $this->fastResponse($this->response, 200);
             }
             else{
                 $this->response['hasError'] = 1;
-                $this->response['message'] = 'Product with ID = '. $product_id .' doesn\'t exist';
+                $this->response['message'] = 'Products set with ID = '. $product_id .' doesn\'t exist';
                 return $this->fastResponse($this->response, 400);
             }
         }
         $this->response['hasError'] = 1;
-        $this->response['message'] = 'Product ID is null';
+        $this->response['message'] = 'Products set ID is null';
         return $this->fastResponse($this->response, 400);
     }
 
     /* Utilities */
 
-    private function prepareProductObjects($arr){
+    private function prepareProductsSetObjects($arr){
         if(is_object($arr)){
-            return $this->prepareProductObject($arr);
+            return $this->prepareProductsSetObject($arr);
         }
         elseif (is_array($arr)){
             $products = array();
             foreach( $arr as $product ){
-                $products[] = $this->prepareProductObject($product);
+                $products[] = $this->prepareProductsSetObject($product);
             }
             return $products;
         }
@@ -262,16 +246,14 @@ class ProductController extends FOSRestController
             return array();
         }
     }
-    private function prepareProductObject($obj){
+    private function prepareProductsSetObject($obj){
         if(is_object($obj)){
             return array(
                 'id' => $obj->getId(),
-                'code' => $obj->getCode(),
-                'export_code' => $obj->getExportCode(),
-                'name' => $obj->getName(),
-                'price' => $obj->getPrice(),
-                'currency' => $obj->getCurrency(),
-                'measure_unit' => $obj->getMeasureUnit(),
+                'type' => $obj->getType(),
+                'number' => $obj->getNumber(),
+                'id_system' => $obj->getIdSystem(),
+                'products' => $obj->getProducts()->toArray(),
                 'creation_date' => $obj->getCreationDate(),
             );
         }

@@ -12,4 +12,15 @@ use Doctrine\ORM\EntityRepository;
  */
 class ProductRepository extends EntityRepository
 {
+    public function findByIds($ids = array()){
+        if(empty($ids) || is_null($ids)){
+            return array();
+        }
+        $in = '(' . implode( ', ', $ids)  . ')';
+        return $this->getEntityManager()
+            ->createQuery(
+                'SELECT c FROM AppBundle:Product c WHERE c.id in ' . $in . ' ORDER BY c.id ASC'
+            )
+            ->getResult();
+    }
 }

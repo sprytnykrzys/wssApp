@@ -304,6 +304,7 @@ class HierarchyController extends FOSRestController
                 'name' => $obj->getName(),
                 'creation_date' => $obj->getCreationDate(),
                 'level' => $obj->getLevel(),
+                'products' => $obj->getProducts()
             );
         }
         else{

@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * ProductsSet
@@ -30,14 +31,15 @@ class ProductsSet
     private $idSystem;
 
     /**
-     * @var int
-     */
-    private $idSystemProvider;
-
-    /**
      * @var \DateTime
      */
     private $creationDate;
+
+    private $products;
+
+    public function __construct() {
+        $this->products = new ArrayCollection();
+    }
 
 
     /**
@@ -120,29 +122,6 @@ class ProductsSet
     }
 
     /**
-     * Set idSystemProvider
-     *
-     * @param integer $idSystemProvider
-     * @return ProductsSet
-     */
-    public function setIdSystemProvider($idSystemProvider)
-    {
-        $this->idSystemProvider = $idSystemProvider;
-
-        return $this;
-    }
-
-    /**
-     * Get idSystemProvider
-     *
-     * @return integer 
-     */
-    public function getIdSystemProvider()
-    {
-        return $this->idSystemProvider;
-    }
-
-    /**
      * Set creationDate
      *
      * @param \DateTime $creationDate
@@ -163,5 +142,32 @@ class ProductsSet
     public function getCreationDate()
     {
         return $this->creationDate;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getProducts()
+    {
+        return $this->products;
+    }
+
+    /**
+     *
+     * @param array $products
+     *
+     * @return ArrayCollection
+     */
+
+    public function setProducts($products){
+        if(!is_array($products)){
+            return $this->products;
+        }
+        foreach ($products as $prod){
+            if(!$this->products->contains($prod)){
+                $this->products->add($prod);
+            }
+        }
+        return $this->products;
     }
 }

@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
  * Product
  */
@@ -48,6 +49,9 @@ class Product
      * @var \DateTime
      */
     private $creationDate;
+
+
+    private $hierarchy;
 
 
     /**

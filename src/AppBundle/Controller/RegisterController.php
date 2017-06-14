@@ -289,7 +289,8 @@ class RegisterController extends FOSRestController
                 'id_client' => $obj->getIdClient(),
                 'role' => $obj->getRole(),
                 'discount' => $obj->getDiscount(),
-                'last_login' => $obj->getLastLogin()
+                'last_login' => $obj->getLastLogin(),
+                'creation_date' => $obj->getCreationDate(),
             );
         }
         else{

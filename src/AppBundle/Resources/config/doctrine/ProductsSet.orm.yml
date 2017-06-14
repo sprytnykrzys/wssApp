@@ -18,10 +18,21 @@ AppBundle\Entity\ProductsSet:
         idSystem:
             type: integer
             column: id_system
-        idSystemProvider:
-            type: integer
-            column: id_system_provider
+#        idSystemProvider:
+#            type: integer
+#            column: id_system_provider
         creationDate:
             type: datetime
             column: creation_date
     lifecycleCallbacks: {  }
+    manyToMany:
+        products:
+            targetEntity: Product
+            joinTable:
+                name: product_set_product
+                joinColumns:
+                    id_product:
+                        referencedColumnName: id
+                inverseJoinColumns:
+                    id_products_set:
+                        referencedColumnName: id

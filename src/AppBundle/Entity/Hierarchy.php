@@ -2,7 +2,9 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\AppBundle;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Hierarchy
@@ -34,6 +36,12 @@ class Hierarchy
      */
     private $creationDate;
 
+    private $products;
+
+    public function __construct()
+    {
+        $this->products = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -135,5 +143,15 @@ class Hierarchy
     public function getCreationDate()
     {
         return $this->creationDate;
+    }
+
+    /**
+     * Get products
+     *
+     * @return ArrayCollection
+     */
+    public function getProducts()
+    {
+        return $this->products;
     }
 }

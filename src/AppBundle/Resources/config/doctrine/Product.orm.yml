@@ -33,3 +33,10 @@ AppBundle\Entity\Product:
             type: datetime
             column: creation_date
     lifecycleCallbacks: {  }
+    manyToOne:
+        hierarchy:
+            targetEntity: Hierarchy
+            inversedBy: products
+            joinColumn:
+                name: hierarchy_id
+                referencedColumnName: id
