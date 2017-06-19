@@ -5,7 +5,6 @@ namespace AppBundle\Controller;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 
-
 class LoginController extends FOSRestController
 {
     use AppController;
