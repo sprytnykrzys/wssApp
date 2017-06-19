@@ -2,8 +2,6 @@
 
 namespace AppBundle\Entity;
 
-use AppBundle\AppBundle;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -38,9 +36,12 @@ class Hierarchy
 
     private $products;
 
+    private $products_sets;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->products_sets = new ArrayCollection();
     }
 
     /**
@@ -153,5 +154,45 @@ class Hierarchy
     public function getProducts()
     {
         return $this->products;
+    }
+
+    public function getProductsIds(){
+        $ret = array();
+        $keys = $this->products->getKeys();
+        foreach ($keys as $key){
+            $ret[] = $this->products->get($key)->getId();
+        }
+        return $ret;
+    }
+
+    /**
+     * Get products_sets
+     *
+     * @return ArrayCollection
+     */
+    public function getProductsSets()
+    {
+        return $this->products_sets;
+    }
+
+    public function getProductsSetsIds(){
+        $ret = array();
+        $keys = $this->products_sets->getKeys();
+        foreach ($keys as $key){
+            $ret[] = $this->products_sets->get($key)->getId();
+        }
+        return $ret;
+    }
+
+    public function prepareArray(){
+        return array(
+            'id' => $this->getId(),
+            'id_parent' => $this->getIdParent(),
+            'name' => $this->getName(),
+            'creation_date' => $this->getCreationDate(),
+            'level' => $this->getLevel(),
+            'products' => $this->getProductsIds(),
+            'products_sets' => $this->getProductsSetsIds()
+        );
     }
 }

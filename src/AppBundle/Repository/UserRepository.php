@@ -21,6 +21,14 @@ class UserRepository extends EntityRepository
             )
             ->getResult();
     }
+    public function findRecentlyLoggedUsers(){
+        return $this->getEntityManager()
+            ->createQuery(
+                'SELECT u FROM AppBundle:User u WHERE UPPER(u.role) NOT LIKE \'ADMIN\' ORDER BY u.lastLogin DESC'
+            )
+            ->setMaxResults(20)
+            ->getResult();
+    }
     public function getByAuthData( $uid, $token, $ip){
         $em = $this->getEntityManager();
         return $em->getRepository('AppBundle\Entity\User')->findBy(array(

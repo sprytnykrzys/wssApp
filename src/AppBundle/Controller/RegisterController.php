@@ -3,10 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
-use AppBundle\Controller\AppController;
 use FOS\RestBundle\Controller\FOSRestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 
 class RegisterController extends FOSRestController
@@ -181,12 +178,18 @@ class RegisterController extends FOSRestController
         $dataJSON = $this->getJSONRequest();
 
         $uid = isset($dataJSON['uid']) ? $dataJSON['uid'] : $request->get('uid');
+        $recently_logged = isset($dataJSON['recently_logged']) ? $dataJSON['recently_logged'] : $request->get('recently_logged');
         if(!is_null($uid)){
             return $this->getUserByUidAction($uid);
         }
         else{
             $em = $this->getDoctrine()->getManager();
-            $users = $em->getRepository('AppBundle\Entity\User')->findAllClients();
+            if(!is_null($recently_logged)){
+                $users = $em->getRepository('AppBundle\Entity\User')->findRecentlyLoggedUsers();
+            }
+            else{
+                $users = $em->getRepository('AppBundle\Entity\User')->findAllClients();
+            }
 
             return $this->fastResponse(array(
                 'users' => $this->prepareUserObjects($users)

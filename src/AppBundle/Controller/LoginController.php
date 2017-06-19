@@ -2,11 +2,7 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\User;
-use AppBundle\Controller\AppController;
 use FOS\RestBundle\Controller\FOSRestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 
 class LoginController extends FOSRestController
@@ -21,8 +17,8 @@ class LoginController extends FOSRestController
 
         $dataJSON = $this->getJSONRequest();
 
-        $mail = isset($dataJSON['email']) ? $dataJSON['email'] : $this->request->get('email');
-        $pass =  isset($dataJSON['password']) ? $dataJSON['password'] : $this->request->get('password');
+        $mail = isset($dataJSON['auth']['email']) ? $dataJSON['auth']['email'] : $this->request->get('email');
+        $pass =  isset($dataJSON['auth']['password']) ? $dataJSON['auth']['password'] : $this->request->get('password');
 
         $pass = $this->hashPassword($pass);
 
@@ -39,7 +35,7 @@ class LoginController extends FOSRestController
         $em->persist( $user );
         $em->flush();
 
-        $this->response['user'] = array(
+        $this->response['auth'] = array(
             'uid' => $user->getId(),
             'token' => $this->generateTokenAndUpdate($user, true),
             'role' => $user->getRole(),

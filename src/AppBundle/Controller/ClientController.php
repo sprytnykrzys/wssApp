@@ -3,10 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Client;
-use AppBundle\Controller\AppController;
 use FOS\RestBundle\Controller\FOSRestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 
 class ClientController extends FOSRestController
@@ -116,7 +113,8 @@ class ClientController extends FOSRestController
             $users = $em->getRepository('AppBundle\Entity\Client')->findAll();
 
             return $this->fastResponse(array(
-                'clients' => $this->prepareClientObjects($users)
+                'clients' => $this->prepareClientObjects($users, true),
+                'general_stats' => $this->getGeneralStats(),
             ), 200);
         }
     }
@@ -131,7 +129,8 @@ class ClientController extends FOSRestController
             $user = $em->getRepository('AppBundle\Entity\Client')->find($id);
 
             return $this->fastResponse(array(
-                'client' => $this->prepareClientObjects($user)
+                'client' => $this->prepareClientObjects($user, true),
+                'general_stats' => $this->getGeneralStats(),
             ), 200);
         }
         else{
@@ -173,11 +172,18 @@ class ClientController extends FOSRestController
             $em = $this->getDoctrine()->getManager();
             $client = $em->getRepository('AppBundle\Entity\Client')->find($id);
             if(is_object($client)){
+                $users = $em->getRepository('AppBundle\Entity\User')->findBy(array(
+                    'role' => 'CLIENT',
+                    'idClient' => $client->getId(),
+                ));
+                foreach($users as $user){
+                    $em->remove( $user );
+                }
                 $em->remove( $client );
                 $em->flush();
 
                 $this->response['success'] = 1;
-                $this->response['message'] = 'Client with ID = '. $id .' has been removed';
+                $this->response['message'] = 'Client with ID = '. $id .' has been removed with their associated users';
                 return $this->fastResponse($this->response, 200);
             }
             else{
@@ -190,14 +196,15 @@ class ClientController extends FOSRestController
         $this->response['message'] = 'ID is null';
         return $this->fastResponse($this->response, 400);
     }
-    private function prepareClientObjects($arr){
+
+    private function prepareClientObjects($arr, $withUsers = false){
         if(is_object($arr)){
-            return $this->prepareClientObject($arr);
+            return $this->prepareClientObject($arr, $withUsers);
         }
         elseif (is_array($arr)){
             $clients = array();
             foreach( $arr as $client ){
-                $clients[] = $this->prepareClientObject($client);
+                $clients[] = $this->prepareClientObject($client, $withUsers);
             }
             return $clients;
         }
@@ -206,17 +213,48 @@ class ClientController extends FOSRestController
         }
     }
 
-    private function prepareClientObject($obj){
+    /**
+     * @Route("/client/{id_client}/generate_offer/")
+     * @Method({"POST"})
+     */
+    /* update information in client stats */
+
+    private function prepareClientObject($obj, $withUsers = false){
         if(is_object($obj)){
-            return array(
+            $ret = array(
                 'id' => $obj->getId(),
                 'name' => $obj->getName(),
                 'discount' => $obj->getDiscount(),
                 'creation_date' => $obj->getCreationDate(),
+                'stats' => array(
+                    'login_count' => 12,
+                    'offers_count' => 12,
+                ),
             );
+            if($withUsers){
+                $em = $this->getDoctrine()->getManager();
+                $users = $em->getRepository('AppBundle\Entity\User')->findBy(array(
+                    'role' => 'CLIENT',
+                    'idClient' => $ret['id'],
+                ), array(
+                    'lastLogin' => 'DESC'
+                ));
+                $ret['users'] = array();
+                foreach ($users as $index => $user) {
+                    $ret['users'][] = $user->prepareArray();
+                }
+            }
+            return $ret;
         }
         else{
             return array();
         }
+    }
+
+    private function getGeneralStats(){
+        return array(
+            'all_logins_count' => 156,
+            'all_offers_count' => 385,
+        );
     }
 }

@@ -3,10 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Hierarchy;
-use AppBundle\Controller\AppController;
 use FOS\RestBundle\Controller\FOSRestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 
 class HierarchyController extends FOSRestController
@@ -148,9 +145,49 @@ class HierarchyController extends FOSRestController
         if(!$this->isAdmin()){
             return $this->tooFewPrivilegesResponse();
         }
+        $em = $this->getDoctrine()->getManager();
+        /* rubbish to REMOVE */
+        $repo = $em->getRepository('AppBundle\Entity\Hierarchy');
+        $all = $repo->findAll();
+
+        $hierarchy = $repo->findOneBy(array(
+            'id' => $id,
+            'level' => $level
+        ));
+        $hierarchyArray = $this->prepareHierarchyObject($hierarchy);
+        $allArray = $this->prepareHierarchyObjects($all);
+        $allArray = $repo->findAllNested($allArray, $hierarchy->getId());
+
+        $empty = array();
+        $errors = array();
+
+        foreach ($allArray as $key => $node){
+            if(
+                empty($node['products']) &&
+                empty($node['products_sets'])
+            ){
+                $empty[] = $allArray[$key];
+            }
+            else{
+                $errors = $node['id'] . ' is not empty';
+            }
+        }
+        if(is_array($hierarchyArray) && empty($hierarchyArray['products']) && empty($hierarchyArray['products_sets'])){
+            $empty[] = $hierarchy;
+        }
+        else if(is_array($hierarchyArray)){
+            $errors = $hierarchyArray['id'] . ' is not empty';
+        }
+
+        return $this->fastResponse(array(
+            'hier' => $hierarchyArray,
+            'empty' => $empty,
+            'errors' => $errors,
+            'children' => $allArray,
+        ));
+        /* TO REMOVE */
 
         if(!is_null($id)){
-            $em = $this->getDoctrine()->getManager();
             $hierarchy = $em->getRepository('AppBundle\Entity\Hierarchy')->findOneBy(array(
                 'id' => $id,
                 'level' => $level
@@ -173,6 +210,9 @@ class HierarchyController extends FOSRestController
         $this->response['success'] = 1;
         $this->response['message'] = 'ok';
         return $this->fastResponse($this->response, 200);
+    }
+    private function deleteRecursive($hierarchy){
+
     }
     /* Catalog services set */
     /**
@@ -304,7 +344,8 @@ class HierarchyController extends FOSRestController
                 'name' => $obj->getName(),
                 'creation_date' => $obj->getCreationDate(),
                 'level' => $obj->getLevel(),
-                'products' => $obj->getProducts()
+                'products' => $obj->getProductsIds(),
+                'products_sets' => $obj->getProductsSetsIds()
             );
         }
         else{

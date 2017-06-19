@@ -25,3 +25,6 @@ AppBundle\Entity\Hierarchy:
         products:
             targetEntity: Product
             mappedBy: hierarchy
+        products_sets:
+            targetEntity: ProductsSet
+            mappedBy: hierarchy

@@ -2,8 +2,6 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
 /**
  * User
  */
@@ -309,5 +307,22 @@ class User
 
     public function updateUserStats(){
 
+    }
+
+    /**
+     * Generate array based on object for view purposes
+     *
+     * @return array
+     */
+    public function prepareArray(){
+        return array(
+            'uid' => $this->getId(),
+            'email' => $this->getEmail(),
+            'id_client' => $this->getIdClient(),
+            'role' => $this->getRole(),
+            'discount' => $this->getDiscount(),
+            'last_login' => $this->getLastLogin(),
+            'creation_date' => $this->getCreationDate(),
+        );
     }
 }

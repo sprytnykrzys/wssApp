@@ -2,13 +2,11 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Product;
 use AppBundle\Controller\AppController as AppController;
+use AppBundle\Entity\Product;
+use AppBundle\Helper\FileManager;
 use FOS\RestBundle\Controller\FOSRestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
-
 
 class ProductController extends FOSRestController
 {
@@ -52,6 +50,7 @@ class ProductController extends FOSRestController
         $new = false;
         $em = $this->getDoctrine()->getManager();
         $request = Request::createFromGlobals();
+        $pathToImages = $this->webDir.Product::$imagePath;
 
         $dataJSON = $this->getJSONRequest();
 
@@ -122,6 +121,20 @@ class ProductController extends FOSRestController
             }
         }
 
+        if(!is_null($id_system)){
+            $system = $em->getRepository('AppBundle\Entity\Hierarchy')->find($id_system);
+            if(is_object($system) && $system->getLevel() == 2){
+                $product->setHierarchy($system);
+            }
+            else{
+                $this->errorPush( 'System doesn\'t exist required', 'id_system');
+            }
+        }
+        else{
+            $this->errorPush( 'System doesn\'t exist required', 'id_system');
+        }
+
+
         if(!is_null($measure_unit)){
             $product->setMeasureUnit($measure_unit);
         }
@@ -139,6 +152,16 @@ class ProductController extends FOSRestController
 
         $em->persist( $product );
         $em->flush();
+
+        if(!is_null($image)){
+            $image = new FileManager( $pathToImages, $image );
+            if($image != false){
+                $fileName = $image->save( $product->getId() );
+                $product->setImage(  $fileName );
+                $em->persist($product);
+                $em->flush();
+            }
+        }
 
         return $this->fastResponse([
             'success' => 1,
@@ -161,7 +184,7 @@ class ProductController extends FOSRestController
 
         return $this->fastResponse([
             'success' => 1,
-            'products' => $products
+            'products' => $this->prepareProductObjects($products),
         ] , 200);
     }
 
@@ -264,16 +287,7 @@ class ProductController extends FOSRestController
     }
     private function prepareProductObject($obj){
         if(is_object($obj)){
-            return array(
-                'id' => $obj->getId(),
-                'code' => $obj->getCode(),
-                'export_code' => $obj->getExportCode(),
-                'name' => $obj->getName(),
-                'price' => $obj->getPrice(),
-                'currency' => $obj->getCurrency(),
-                'measure_unit' => $obj->getMeasureUnit(),
-                'creation_date' => $obj->getCreationDate(),
-            );
+            return $obj->prepareArray();
         }
         else if(is_array($obj)){
             return $obj;

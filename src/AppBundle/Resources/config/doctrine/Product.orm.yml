@@ -19,6 +19,10 @@ AppBundle\Entity\Product:
         name:
             type: text
             length: '64'
+        image:
+            type: text
+            length: '64'
+            nullable: true
         price:
             type: float
         currency:
@@ -40,3 +44,7 @@ AppBundle\Entity\Product:
             joinColumn:
                 name: hierarchy_id
                 referencedColumnName: id
+    manyToMany:
+        products_sets:
+            targetEntity: ProductsSet
+            mappedBy: products

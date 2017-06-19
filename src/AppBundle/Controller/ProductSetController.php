@@ -2,18 +2,15 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\ProductsSet;
 use AppBundle\Controller\AppController as AppController;
+use AppBundle\Entity\ProductsSet;
+use AppBundle\Helper\FileManager;
 use FOS\RestBundle\Controller\FOSRestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
-
 
 class ProductSetController extends FOSRestController
 {
     use AppController;
-
 
     /**
      * @Route("/products_set")
@@ -38,6 +35,52 @@ class ProductSetController extends FOSRestController
     }
 
     /**
+     * @Route("/products_set/remove_product/")
+     * @Method({"POST"})
+     */
+    public function removeProductFromSetAction()
+    {
+        if( !$this->authenticate()){
+            return $this->prepareAuthRequiredResponse();
+        }
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $request = Request::createFromGlobals();
+
+        $dataJSON = $this->getJSONRequest();
+
+        $products_set_id = isset($dataJSON['products_set']['id_set']) ? $dataJSON['products_set']['id_set'] : $request->get('id_set');
+        $id_product = isset($dataJSON['products_set']['id_product']) ? $dataJSON['products_set']['id_product'] : $request->get('id_product');
+
+        if(is_null($products_set_id)){
+            return $this->fastResponse(['message' => array('ID Products set is null') ] , 400);
+        }
+        if(is_null($id_product)){
+            return $this->fastResponse(['message' => array('ID Product is null') ] , 400);
+        }
+        $product_set = $em->getRepository('AppBundle\Entity\ProductsSet')->find($products_set_id);
+        $product = $em->getRepository('AppBundle\Entity\Product')->find($id_product);
+
+        if(!is_object($product_set)){
+            return $this->fastResponse(['message' => array('Products set doesn\'t exist') ] , 400);
+        }
+        if(!is_object($product)){
+            return $this->fastResponse(['message' => array('Product doesn\'t exist') ] , 400);
+        }
+        $product_set->unsetProduct($product);
+
+//        $em->persist( $product_set );
+        $em->flush();
+
+        return $this->fastResponse([
+            'message' => array('Successfully removed')
+        ] , 200);
+    }
+
+    /**
      * @Route("/products_set/{products_set_id}/")
      * @Method({"POST"})
      */
@@ -52,6 +95,7 @@ class ProductSetController extends FOSRestController
         $new = false;
         $em = $this->getDoctrine()->getManager();
         $request = Request::createFromGlobals();
+        $pathToImages = $this->webDir.ProductsSet::$imagePath;
 
         $dataJSON = $this->getJSONRequest();
 
@@ -67,13 +111,22 @@ class ProductSetController extends FOSRestController
             $new = true;
         }
 
-        $number = isset($dataJSON['products_set']['number']) ? $dataJSON['products_set']['number'] : $request->get('number');
+        $name = isset($dataJSON['products_set']['name']) ? $dataJSON['products_set']['name'] : $request->get('name');
+        $number = isset($dataJSON['products_set']['code']) ? $dataJSON['products_set']['code'] : $request->get('code');
         $type = isset($dataJSON['products_set']['type']) ? $dataJSON['products_set']['type'] : $request->get('type');
         $id_system = isset($dataJSON['products_set']['id_system']) ? $dataJSON['products_set']['id_system'] : $request->get('id_system');
         $products = isset($dataJSON['products_set']['products']) ? $dataJSON['products_set']['products'] : $request->get('products');
+        $image = isset($dataJSON['products_set']['image']) ? $dataJSON['products_set']['image'] : $request->get('image');
         //$creation_date = isset($dataJSON['product']['creation_date']) ? $dataJSON['product']['creation_date'] : $request->get('creation_date');
 
-
+        if(!is_null($name)){
+            $product->setName($name);
+        }
+        else{
+            if(!$product->getName()){
+                $this->errorPush( 'Name is required', 'name');
+            }
+        }
 
         if(!is_null($number)){
             $product->setNumber($number);
@@ -102,6 +155,19 @@ class ProductSetController extends FOSRestController
             }
         }
 
+        if(!is_null($id_system)){
+            $system = $em->getRepository('AppBundle\Entity\Hierarchy')->find($id_system);
+            if(is_object($system) && $system->getLevel() == 2){
+                $product->setHierarchy($system);
+            }
+            else{
+                $this->errorPush( 'System doesn\'t exist required', 'id_system');
+            }
+        }
+        else{
+            $this->errorPush( 'System doesn\'t exist required', 'id_system');
+        }
+
         $coll = array();
         if(is_array($products)){
             $coll = $em->getRepository('AppBundle\Entity\Product')->findByIds( $products );
@@ -123,12 +189,22 @@ class ProductSetController extends FOSRestController
         $em->persist( $product );
         $em->flush();
 
+        if(!is_null($image)){
+            $image = new FileManager( $pathToImages, $image );
+            if($image != false){
+                $fileName = $image->save( $product->getId() );
+                $product->setImage(  $fileName );
+                $em->persist($product);
+                $em->flush();
+            }
+        }
+
         return $this->fastResponse([
             'success' => 1,
             'product' => $this->prepareProductsSetObjects($product),
             'coll' => $coll,
             'message' => array(
-                $new ? 'product added successfully' : 'product updated successfully'
+                $new ? 'products set added successfully' : 'products set updated successfully'
             )
         ] , 200);
     }
@@ -145,7 +221,7 @@ class ProductSetController extends FOSRestController
 
         return $this->fastResponse([
             'success' => 1,
-            'products_sets' => $products
+            'products_sets' => $this->prepareProductsSetObjects($products)
         ] , 200);
     }
 
@@ -248,14 +324,7 @@ class ProductSetController extends FOSRestController
     }
     private function prepareProductsSetObject($obj){
         if(is_object($obj)){
-            return array(
-                'id' => $obj->getId(),
-                'type' => $obj->getType(),
-                'number' => $obj->getNumber(),
-                'id_system' => $obj->getIdSystem(),
-                'products' => $obj->getProducts()->toArray(),
-                'creation_date' => $obj->getCreationDate(),
-            );
+            return $obj->prepareArray();
         }
         else if(is_array($obj)){
             return $obj;

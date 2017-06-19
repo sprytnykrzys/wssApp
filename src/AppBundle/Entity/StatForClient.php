@@ -2,12 +2,10 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
 /**
- * StatForUser
+ * StatForClient
  */
-class StatForUser
+class StatForClient
 {
     /**
      * @var int
@@ -17,7 +15,7 @@ class StatForUser
     /**
      * @var int
      */
-    private $idUser;
+    private $idClient;
 
     /**
      * @var int
@@ -44,7 +42,7 @@ class StatForUser
      * Set idUser
      *
      * @param integer $idUser
-     * @return StatForUser
+     * @return StatForClient
      */
     public function setIdUser($idUser)
     {
@@ -67,7 +65,7 @@ class StatForUser
      * Set loginCount
      *
      * @param integer $loginCount
-     * @return StatForUser
+     * @return StatForClient
      */
     public function setLoginCount($loginCount)
     {
@@ -90,7 +88,7 @@ class StatForUser
      * Set generatedOffersCount
      *
      * @param integer $generatedOffersCount
-     * @return StatForUser
+     * @return StatForClient
      */
     public function setGeneratedOffersCount($generatedOffersCount)
     {

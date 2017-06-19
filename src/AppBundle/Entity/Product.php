@@ -2,14 +2,15 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpFoundation\Request as Request;
 
 /**
  * Product
  */
 class Product
 {
+    public static $imagePath = 'images/product/';
     /**
      * @var int
      */
@@ -29,6 +30,11 @@ class Product
      * @var string
      */
     private $name;
+
+    /**
+     * @var string
+     */
+    private $image;
 
     /**
      * @var float
@@ -52,7 +58,11 @@ class Product
 
 
     private $hierarchy;
+    private $products_sets;
 
+    public function __construct(){
+        $this->products_sets = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -131,6 +141,29 @@ class Product
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set image name
+     *
+     * @param string $image
+     * @return Product
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * Get image name
+     *
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
     }
 
     /**
@@ -223,5 +256,52 @@ class Product
     public function getCreationDate()
     {
         return $this->creationDate;
+    }
+
+    /**
+     * Set hierarchy
+     *
+     * @param Hierarchy $hierarchy
+     * @return Product
+     */
+    public function setHierarchy($hierarchy)
+    {
+        $this->hierarchy = $hierarchy;
+        return $this;
+    }
+
+    /**
+     * Get hierarchy
+     *
+     * @return Hierarchy
+     */
+    public function getHierarchy()
+    {
+        return $this->hierarchy;
+    }
+
+    public function prepareArray(){
+        $ret = array(
+            'id' => $this->getId(),
+            'code' => $this->getCode(),
+            'export_code' => $this->getExportCode(),
+            'name' => $this->getName(),
+            'price' => $this->getPrice(),
+            'currency' => $this->getCurrency(),
+            'measure_unit' => $this->getMeasureUnit(),
+            'creation_date' => $this->getCreationDate(),
+            'id_system' => 0,
+        );
+        if(is_object($this->getHierarchy())){
+            $ret['id_system'] = $this->getHierarchy()->getId();
+        }
+        if(!is_null($this->image)){
+            $base = Request::createFromGlobals()->getSchemeAndHttpHost();
+            if('http://wss.v1' != $base){
+                $base .= '/web';
+            }
+            $ret['image'] = $base.'/'.self::$imagePath.$this->image;
+        }
+        return $ret;
     }
 }

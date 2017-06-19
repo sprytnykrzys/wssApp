@@ -1,7 +1,7 @@
-AppBundle\Entity\StatForUser:
+AppBundle\Entity\StatForClient:
     type: entity
     table: null
-    repositoryClass: AppBundle\Repository\StatForUserRepository
+    repositoryClass: AppBundle\Repository\StatForClientRepository
     id:
         id:
             type: integer
@@ -9,9 +9,9 @@ AppBundle\Entity\StatForUser:
             generator:
                 strategy: AUTO
     fields:
-        idUser:
+        idClient:
             type: integer
-            column: id_user
+            column: id_client
         loginCount:
             type: integer
             nullable: true
