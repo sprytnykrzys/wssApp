@@ -7,6 +7,8 @@ use AppBundle\Entity\Product;
 use AppBundle\Helper\FileManager;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 class ProductController extends FOSRestController
 {

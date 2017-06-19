@@ -5,6 +5,8 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\User;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 class RegisterController extends FOSRestController
 {
