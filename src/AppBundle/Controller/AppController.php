@@ -8,7 +8,7 @@ use AppBundle\Entity\User;
 
 trait AppController
 {
-    protected $DEBUG = true;
+    protected $DEBUG = false;
     /*
      * Token lifetime in hours
      */
@@ -47,8 +47,8 @@ trait AppController
         $ip = $this->request->getClientIp();
 
         $dataJSON = $this->getJSONRequest();
-        $uid = isset($dataJSON['auth']['uid']) ? $dataJSON['uid'] : $this->request->get('uid');
-        $token = isset($dataJSON['auth']['token']) ? $dataJSON['token'] : $this->request->get('token');
+        $uid = isset($dataJSON['auth']['uid']) ? $dataJSON['auth']['uid'] : $this->request->get('uid');
+        $token = isset($dataJSON['auth']['token']) ? $dataJSON['auth']['token'] : $this->request->get('token');
         
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository('AppBundle\Entity\User')->getByAuthData($uid, $token, $ip);

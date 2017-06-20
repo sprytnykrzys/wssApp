@@ -34,7 +34,7 @@ class UserRepository extends EntityRepository
         return $em->getRepository('AppBundle\Entity\User')->findBy(array(
             'id' => $uid,
             'token' => $token,
-            'last_host' => $ip
+            'lastHost' => $ip
         ));
     }
     public function getByLoginCredentials( $email, $password ){
