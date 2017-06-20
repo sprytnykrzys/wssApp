@@ -14,6 +14,41 @@ class ClientController extends FOSRestController
     use AppController;
     const KEY = 'rmuwt6546wel4t65';
 
+    /**
+     * @Route("/client/generate_offer/")
+     * @Method({"POST"})
+     */
+    public function generateOfferAction(){
+        if( !$this->authenticate()){
+            return $this->prepareAuthRequiredResponse();
+        }
+        if(!$this->isClient()){
+            return $this->tooFewPrivilegesResponse();
+        }
+        $em = $this->getDoctrine()->getManager();
+        $repo = $em->getRepository('AppBundle\Entity\Client');
+        if(is_object($this->user) && $id_client = $this->user->getIdClient()){
+            $client = $repo->find($id_client);
+            if(is_object($client)){
+                $client->incrementGeneratedOffers();
+                $em->flush();
+                return $this->fastResponse([
+                    'success' => 1,
+                    'client' => $this->prepareClientObject($client),
+                    'message' => array(
+                        'offer counter increased'
+                    )
+                ] , 200);
+            }
+        }
+        return $this->fastResponse([
+            'hasError' => 1,
+            'errors' => array(
+                'cannot find client for user'
+            )
+        ] , 400);
+    }
+
     /* compatibility workaround */
     /**
      * @Route("/client/delete")
@@ -99,34 +134,6 @@ class ClientController extends FOSRestController
                 'client added successfully'
             )
         ] , 200);
-    }
-
-    /**
-     * @Route("/client/{id_client}/generate_offer/")
-     * @Method({"POST"})
-     */
-    public function generateOfferAction($id_client){
-        if( !$this->authenticate()){
-            return $this->prepareAuthRequiredResponse();
-        }
-        if(!$this->isClient()){
-            return $this->tooFewPrivilegesResponse();
-        }
-        $em = $this->getDoctrine()->getManager();
-        $repo = $em->getRepository('AppBundle\Entity\Client');
-        if(is_object($this->user) && $this->user->getIdClient() == $id_client){
-            $client = $repo->find($id_client);
-            if(is_object($client)){
-                $client->incrementGeneratedOffers();
-                return $this->fastResponse([
-                    'success' => 1,
-                    'client' => $this->prepareClientObject($client),
-                    'message' => array(
-                        'client added successfully'
-                    )
-                ] , 200);
-            }
-        }
     }
 
     /**
