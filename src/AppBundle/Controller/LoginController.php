@@ -36,6 +36,12 @@ class LoginController extends FOSRestController
         }
         $now = new \DateTime("now");
         $user->setLastLogin($now);
+        if($id_client = $user->getIdClient()){
+            $client = $em->getRepository('AppBundle\Entity\Client')->find($id_client);
+            if(is_object($client)){
+                $client->incrementLoginCount();
+            }
+        }
         $em->persist( $user );
         $em->flush();
 

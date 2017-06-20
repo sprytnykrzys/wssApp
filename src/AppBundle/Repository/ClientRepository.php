@@ -12,12 +12,22 @@ use Doctrine\ORM\EntityRepository;
  */
 class ClientRepository extends EntityRepository
 {
-    public function getByToken()
+    public function findAllLoginsCount()
     {
+        $dql = "SELECT SUM(c.loginCount) AS all_logins FROM AppBundle:Client c";
         return $this->getEntityManager()
             ->createQuery(
-                'SELECT p FROM AppBundle:User u ORDER BY u.id ASC'
+                $dql
             )
-            ->getResult();
+            ->getSingleScalarResult();
+    }
+
+    public function findAllOffersCount(){
+        $dql = "SELECT SUM(c.generatedOffersCount) AS all_offers FROM AppBundle:Client c";
+        return $this->getEntityManager()
+            ->createQuery(
+                $dql
+            )
+            ->getSingleScalarResult();
     }
 }

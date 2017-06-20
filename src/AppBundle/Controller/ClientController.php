@@ -74,6 +74,8 @@ class ClientController extends FOSRestController
                 $client = new Client();
                 $now = new \DateTime("now");
                 $client->setCreationDate($now);
+                $client->setLoginCount(0);
+                $client->setGeneratedOffersCount(0);
             }
         }
         else{
@@ -97,6 +99,34 @@ class ClientController extends FOSRestController
                 'client added successfully'
             )
         ] , 200);
+    }
+
+    /**
+     * @Route("/client/{id_client}/generate_offer/")
+     * @Method({"POST"})
+     */
+    public function generateOfferAction($id_client){
+        if( !$this->authenticate()){
+            return $this->prepareAuthRequiredResponse();
+        }
+        if(!$this->isClient()){
+            return $this->tooFewPrivilegesResponse();
+        }
+        $em = $this->getDoctrine()->getManager();
+        $repo = $em->getRepository('AppBundle\Entity\Client');
+        if(is_object($this->user) && $this->user->getIdClient() == $id_client){
+            $client = $repo->find($id_client);
+            if(is_object($client)){
+                $client->incrementGeneratedOffers();
+                return $this->fastResponse([
+                    'success' => 1,
+                    'client' => $this->prepareClientObject($client),
+                    'message' => array(
+                        'client added successfully'
+                    )
+                ] , 200);
+            }
+        }
     }
 
     /**
@@ -234,10 +264,6 @@ class ClientController extends FOSRestController
         }
     }
 
-    /**
-     * @Route("/client/{id_client}/generate_offer/")
-     * @Method({"POST"})
-     */
     /* update information in client stats */
 
     private function prepareClientObject($obj, $withUsers = false){
@@ -248,8 +274,8 @@ class ClientController extends FOSRestController
                 'discount' => $obj->getDiscount(),
                 'creation_date' => $obj->getCreationDate(),
                 'stats' => array(
-                    'login_count' => 12,
-                    'offers_count' => 12,
+                    'login_count' => $obj->getLoginCount(),
+                    'offers_count' => $obj->getGeneratedOffersCount(),
                 ),
             );
             if($withUsers){
@@ -273,9 +299,11 @@ class ClientController extends FOSRestController
     }
 
     private function getGeneralStats(){
+        $em = $this->getDoctrine()->getManager();
+        $repo = $em->getRepository('AppBundle\Entity\Client');
         return array(
-            'all_logins_count' => 156,
-            'all_offers_count' => 385,
+            'all_logins_count' => $repo->findAllLoginsCount(),
+            'all_offers_count' => $repo->findAllOffersCount(),
         );
     }
     private function metodsFixForPHPSTORM(){

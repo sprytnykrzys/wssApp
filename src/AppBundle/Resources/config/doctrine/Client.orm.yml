@@ -18,4 +18,14 @@ AppBundle\Entity\Client:
         name:
             type: text
             length: 255
+        loginCount:
+            type: integer
+            options:
+                default: 0
+            column: login_count
+        generatedOffersCount:
+            type: integer
+            options:
+                default: 0
+            column: generated_offers_count
     lifecycleCallbacks: {  }

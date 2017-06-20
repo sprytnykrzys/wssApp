@@ -29,6 +29,16 @@ class Client
      */
     private $name;
 
+    /**
+     * @var int
+     */
+    private $loginCount;
+
+    /**
+     * @var int
+     */
+    private $generatedOffersCount;
+
 
     /**
      * Get id
@@ -108,4 +118,78 @@ class Client
     {
         return $this->name;
     }
+
+    /**
+     * Set loginCount
+     *
+     * @param int $loginCount
+     * @return Client
+     */
+    public function setLoginCount($loginCount)
+    {
+        $this->loginCount = $loginCount;
+
+        return $this;
+    }
+
+    /**
+     * Increment loginCount
+     *
+     * @param int $loginCount
+     * @return Client
+     */
+    public function incrementLoginCount()
+    {
+        $this->loginCount += 1;
+
+        return $this;
+    }
+
+    /**
+     * Get loginCount
+     *
+     * @return int
+     */
+    public function getLoginCount()
+    {
+        return $this->loginCount;
+    }
+
+    /**
+     * Set generatedOffersCount
+     *
+     * @param int $generatedOffersCount
+     * @return Client
+     */
+    public function setGeneratedOffersCount($generatedOffersCount)
+    {
+        $this->generatedOffersCount = $generatedOffersCount;
+
+        return $this;
+    }
+
+    /**
+     * Increment generatedOffersCount
+     *
+     * @param int $generatedOffersCount
+     * @return Client
+     */
+    public function incrementGeneratedOffers()
+    {
+        $this->generatedOffersCount += 1;
+
+        return $this;
+    }
+
+    /**
+     * Get generatedOffersCount
+     *
+     * @return int
+     */
+    public function getGeneratedOffersCount()
+    {
+        return $this->generatedOffersCount;
+    }
+
+
 }

@@ -74,12 +74,21 @@ trait AppController
         $this->authenticated = true;
         return true;
     }
+
     protected function isAdmin(){
         if($this->DEBUG){
             return true;
         }
         return !is_null($this->user) && is_object($this->user) && $this->user->getRole() == 'ADMIN';
     }
+
+    protected function isClient(){
+        if($this->DEBUG){
+            return true;
+        }
+        return !is_null($this->user) && is_object($this->user) && ($this->user->getRole() == 'CLIENT' || $this->user->getRole() == 'ADMIN');
+    }
+
     public function tooFewPrivilegesResponse(){
         $view = $this->view(array_merge($this->getResponse(), array(
             'hasError' => 1,
@@ -87,16 +96,19 @@ trait AppController
         )), 403, $this->corsHeaders);
         return $this->handleView($view);
     }
+
     private function applyCORSHeaders(){
         foreach ($this->corsHeaders as $name => $val){
             header("$name: $val");
         };
 //        $this->dump(headers_list(), false);
     }
+
     public function prepareAuthRequiredResponse(){
         $view = $this->view($this->getResponse(), 403, $this->corsHeaders);
         return $this->handleView($view);
     }
+
     public  function fastResponse($params = null, $code = 200){
         if(is_null($params)){
             $params = $this->getResponse();
