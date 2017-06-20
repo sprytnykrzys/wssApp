@@ -2,11 +2,10 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Controller\AppController;
+use AppBundle\Controller\AppController as AppController;
 use FOS\RestBundle\Controller\FOSRestController as FOSRestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends FOSRestController
@@ -27,5 +26,9 @@ class DefaultController extends FOSRestController
         ));
         $view = $this->view($this->getResponse(), 200, $this->corsHeaders);
         return $this->handleView($view);
+    }
+    private function metodsFixForPHPSTORM(){
+        new Route(array());
+        new Method(array());
     }
 }

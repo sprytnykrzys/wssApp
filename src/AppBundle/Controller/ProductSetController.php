@@ -6,9 +6,9 @@ use AppBundle\Controller\AppController as AppController;
 use AppBundle\Entity\ProductsSet;
 use AppBundle\Helper\FileManager;
 use FOS\RestBundle\Controller\FOSRestController;
-use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 class ProductSetController extends FOSRestController
 {
@@ -334,6 +334,10 @@ class ProductSetController extends FOSRestController
         else{
             return array();
         }
+    }
+    private function metodsFixForPHPSTORM(){
+        new Route(array());
+        new Method(array());
     }
 
 }

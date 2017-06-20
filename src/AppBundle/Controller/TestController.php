@@ -2,11 +2,11 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Controller\AppController as AppController;
 use AppBundle\Entity\Test;
-use AppBundle\Controller\AppController;
 use FOS\RestBundle\Controller\FOSRestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -84,6 +84,10 @@ class TestController extends FOSRestController
             'text' => $obj->getText(),
             'text2' => $obj->getText2()
         );
+    }
+    private function metodsFixForPHPSTORM(){
+        new Route(array());
+        new Method(array());
     }
 
 }

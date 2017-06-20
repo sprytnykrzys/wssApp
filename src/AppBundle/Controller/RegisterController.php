@@ -2,11 +2,12 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Controller\AppController as AppController;
 use AppBundle\Entity\User;
 use FOS\RestBundle\Controller\FOSRestController;
-use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 class RegisterController extends FOSRestController
 {
@@ -301,5 +302,9 @@ class RegisterController extends FOSRestController
         else{
             return array();
         }
+    }
+    private function metodsFixForPHPSTORM(){
+        new Route(array());
+        new Method(array());
     }
 }

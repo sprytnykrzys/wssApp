@@ -2,8 +2,11 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Controller\AppController as AppController;
 use AppBundle\Entity\Hierarchy;
 use FOS\RestBundle\Controller\FOSRestController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 class HierarchyController extends FOSRestController
@@ -146,7 +149,7 @@ class HierarchyController extends FOSRestController
             return $this->tooFewPrivilegesResponse();
         }
         $em = $this->getDoctrine()->getManager();
-        /* rubbish to REMOVE */
+
         $repo = $em->getRepository('AppBundle\Entity\Hierarchy');
 
         $hierarchy = $repo->findOneBy(array(
@@ -190,15 +193,6 @@ class HierarchyController extends FOSRestController
         else if(is_array($hierarchyArray)){
             $errors = self::levels[ $hierarchyArray['level'] ] . ' ' .  $hierarchyArray['id'] . ' is not empty';
         }
-
-//        return $this->fastResponse(array(
-//            'hier' => $hierarchyArray,
-//            'empty' => $empty,
-//            'errors' => $errors,
-//            'children' => $allArray,
-//            'all' => $all,
-//        ));
-        /* TO REMOVE */
 
         if(empty($errors)){
             foreach($empty as $hierarchySingle){
@@ -368,5 +362,9 @@ class HierarchyController extends FOSRestController
         }
         $hierarchy = $repo->find($id);
         return is_object($hierarchy);
+    }
+    private function metodsFixForPHPSTORM(){
+        new Route(array());
+        new Method(array());
     }
 }
