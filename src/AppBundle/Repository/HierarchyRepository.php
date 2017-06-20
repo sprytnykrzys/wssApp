@@ -61,7 +61,10 @@ class HierarchyRepository extends EntityRepository
                 }
             }
         }
-        return $tree['subhierarchyElements'];
+        if(isset($tree['subhierarchyElements'])){
+            return $tree['subhierarchyElements'];
+        }
+        return array();
     }
     /* helper methods */
 

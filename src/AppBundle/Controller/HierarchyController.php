@@ -5,8 +5,6 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Hierarchy;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 class HierarchyController extends FOSRestController
 {
@@ -150,12 +148,24 @@ class HierarchyController extends FOSRestController
         $em = $this->getDoctrine()->getManager();
         /* rubbish to REMOVE */
         $repo = $em->getRepository('AppBundle\Entity\Hierarchy');
-        $all = $repo->findAll();
 
         $hierarchy = $repo->findOneBy(array(
             'id' => $id,
             'level' => $level
         ));
+
+        if(!is_object($hierarchy) || (is_object($hierarchy) && $hierarchy->getLevel() != $level)){
+            $this->response['hasError'] = 1;
+            $this->response['errors'] = 'Wrong hierarchy';
+            return $this->fastResponse($this->response, 400);
+        }
+
+        $all = $repo->findAll();
+        $allObjectsByIds = array();
+        foreach ($all as $item) {
+            $allObjectsByIds[ $item->getId() ] = $item;
+        }
+
         $hierarchyArray = $this->prepareHierarchyObject($hierarchy);
         $allArray = $this->prepareHierarchyObjects($all);
         $allArray = $repo->findAllNested($allArray, $hierarchy->getId());
@@ -168,50 +178,43 @@ class HierarchyController extends FOSRestController
                 empty($node['products']) &&
                 empty($node['products_sets'])
             ){
-                $empty[] = $allArray[$key];
+                $empty[] = $allObjectsByIds[$node['id']];
             }
             else{
-                $errors = $node['id'] . ' is not empty';
+                $errors = self::levels[ $node['level'] ] . ' ' .  $node['id'] . ' is not empty';
             }
         }
         if(is_array($hierarchyArray) && empty($hierarchyArray['products']) && empty($hierarchyArray['products_sets'])){
             $empty[] = $hierarchy;
         }
         else if(is_array($hierarchyArray)){
-            $errors = $hierarchyArray['id'] . ' is not empty';
+            $errors = self::levels[ $hierarchyArray['level'] ] . ' ' .  $hierarchyArray['id'] . ' is not empty';
         }
 
-        return $this->fastResponse(array(
-            'hier' => $hierarchyArray,
-            'empty' => $empty,
-            'errors' => $errors,
-            'children' => $allArray,
-        ));
+//        return $this->fastResponse(array(
+//            'hier' => $hierarchyArray,
+//            'empty' => $empty,
+//            'errors' => $errors,
+//            'children' => $allArray,
+//            'all' => $all,
+//        ));
         /* TO REMOVE */
 
-        if(!is_null($id)){
-            $hierarchy = $em->getRepository('AppBundle\Entity\Hierarchy')->findOneBy(array(
-                'id' => $id,
-                'level' => $level
-            ));
-            if(is_object($hierarchy)){
-                $em->remove( $hierarchy );
-                $em->flush();
+        if(empty($errors)){
+            foreach($empty as $hierarchySingle){
+                $em->remove( $hierarchySingle );
+            }
+            $em->flush();
 
-                $this->response['success'] = 1;
-                $this->response['message'] = ucfirst(self::levels[$level]) . ' with ID = '. $id .' has been removed';
-                return $this->fastResponse($this->response, 200);
-            }
-            else{
-                $this->response['hasError'] = 1;
-                $this->response['message'] = ucfirst(self::levels[$level]) . ' with ID = '. $id .' doesn\'t exist';
-                return $this->fastResponse($this->response, 400);
-            }
+            $this->response['success'] = 1;
+            $this->response['message'] = ucfirst(self::levels[$level]) . ' with ID = '. $id .' has been removed';
+            return $this->fastResponse($this->response, 200);
+
         }
 
-        $this->response['success'] = 1;
-        $this->response['message'] = 'ok';
-        return $this->fastResponse($this->response, 200);
+        $this->response['hasError'] = 1;
+        $this->response['errors'] = $errors;
+        return $this->fastResponse($this->response, 400);
     }
     private function deleteRecursive($hierarchy){
 
@@ -238,7 +241,10 @@ class HierarchyController extends FOSRestController
      * @Method({"POST"})
      */
     public function catalogDeleteAction($id = null){
-        return $this->deleteAction($id, self::CATALOG_LEVEL);
+        return $this->fastResponse(array(
+            'error' => 'not implemented'
+        ), 418);
+        // return $this->deleteAction($id, self::CATALOG_LEVEL);
     }
 
     /**
