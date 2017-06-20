@@ -54,14 +54,16 @@ trait AppController
         $user = $em->getRepository('AppBundle\Entity\User')->getByAuthData($uid, $token, $ip);
 
         if(count($user) == 0){
-            $this->response['allow'] = 0;
-            $this->response['errors'][] = 'Authentication required';
+            $this->response['auth'] = array();
+            $this->response['auth']['allow'] = 0;
+            $this->response['auth']['errors'][] = 'Authentication required';
             return false;
         }
         $user = $user[0];
         if( !$this->isTokenValid($user) ){
-            $this->response['allow'] = 0;
-            $this->response['errors'][] = 'Authentication required. Token out of date.';
+            $this->response['auth'] = array();
+            $this->response['auth']['allow'] = 0;
+            $this->response['auth']['errors'][] = 'Authentication required. Token out of date.';
             return false;
         }
         $this->user = $user;

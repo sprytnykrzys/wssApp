@@ -109,6 +109,10 @@ class RegisterController extends FOSRestController
         if( !$this->authenticate()){
             return $this->prepareAuthRequiredResponse();
         }
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
+
         $request = Request::createFromGlobals();
 
         $dataJSON = $this->getJSONRequest();
@@ -228,6 +232,9 @@ class RegisterController extends FOSRestController
         if( !$this->authenticate()){
             return $this->prepareAuthRequiredResponse();
         }
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
         $request = Request::createFromGlobals();
         $dataJSON = $this->getJSONRequest();
 
@@ -250,7 +257,9 @@ class RegisterController extends FOSRestController
         if( !$this->authenticate()){
             return $this->prepareAuthRequiredResponse();
         }
-
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
         if(!is_null($uid)){
             $em = $this->getDoctrine()->getManager();
             $user = $em->getRepository('AppBundle\Entity\User')->find($uid);

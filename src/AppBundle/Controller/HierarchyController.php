@@ -148,6 +148,7 @@ class HierarchyController extends FOSRestController
         if(!$this->isAdmin()){
             return $this->tooFewPrivilegesResponse();
         }
+
         $em = $this->getDoctrine()->getManager();
 
         $repo = $em->getRepository('AppBundle\Entity\Hierarchy');
@@ -209,9 +210,6 @@ class HierarchyController extends FOSRestController
         $this->response['hasError'] = 1;
         $this->response['errors'] = $errors;
         return $this->fastResponse($this->response, 400);
-    }
-    private function deleteRecursive($hierarchy){
-
     }
     /* Catalog services set */
     /**

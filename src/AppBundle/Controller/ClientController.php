@@ -104,6 +104,13 @@ class ClientController extends FOSRestController
      * @Method({"GET"})
      */
     public function getClientAction(){
+        if( !$this->authenticate()){
+            return $this->prepareAuthRequiredResponse();
+        }
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
+
         $request = Request::createFromGlobals();
         $dataJSON = $this->getJSONRequest();
 
@@ -127,6 +134,13 @@ class ClientController extends FOSRestController
      * @Method({"GET"})
      */
     public function getClientsByIdAction($id = null){
+        if( !$this->authenticate()){
+            return $this->prepareAuthRequiredResponse();
+        }
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
+
         if(!is_null($id)){
             $em = $this->getDoctrine()->getManager();
             $user = $em->getRepository('AppBundle\Entity\Client')->find($id);
@@ -152,6 +166,10 @@ class ClientController extends FOSRestController
         if( !$this->authenticate()){
             return $this->prepareAuthRequiredResponse();
         }
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
+
         $request = Request::createFromGlobals();
         $dataJSON = $this->getJSONRequest();
 

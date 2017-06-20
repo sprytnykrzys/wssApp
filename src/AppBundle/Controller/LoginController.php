@@ -28,8 +28,9 @@ class LoginController extends FOSRestController
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository('AppBundle\Entity\User')->getByLoginCredentials($mail, $pass);
         if(!is_object($user)){
-            $this->response['allow'] = 0;
-            $this->response['errors'][] = 'Authentication failed. Wrong credentials provided.';
+            $this->response['auth'] = array();
+            $this->response['auth']['allow'] = 0;
+            $this->response['auth']['errors'][] = 'Authentication failed. Wrong credentials provided.';
             $view = $this->view($this->getResponse(), 400, $this->corsHeaders);
             return $this->handleView($view);
         }
