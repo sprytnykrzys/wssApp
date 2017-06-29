@@ -123,7 +123,7 @@ class ProductController extends FOSRestController
             }
         }
 
-        if(!is_null($id_system)){
+        if(!is_null($id_system) && (int)$id_system){
             $system = $em->getRepository('AppBundle\Entity\Hierarchy')->find($id_system);
             if(is_object($system) && $system->getLevel() == 2){
                 $product->setHierarchy($system);
@@ -132,10 +132,6 @@ class ProductController extends FOSRestController
                 $this->errorPush( 'System doesn\'t exist required', 'id_system');
             }
         }
-        else{
-            $this->errorPush( 'System doesn\'t exist required', 'id_system');
-        }
-
 
         if(!is_null($measure_unit)){
             $product->setMeasureUnit($measure_unit);

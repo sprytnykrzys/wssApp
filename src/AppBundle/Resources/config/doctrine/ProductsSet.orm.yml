@@ -21,6 +21,7 @@ AppBundle\Entity\ProductsSet:
         idSystem:
             type: integer
             column: id_system
+            nullable: true
         image:
             type: text
             length: '64'

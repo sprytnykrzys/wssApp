@@ -96,6 +96,7 @@ class ClientController extends FOSRestController
         $dataJSON = $this->getJSONRequest();
 
         $em = $this->getDoctrine()->getManager();
+        $new = false;
 
         if(is_null($id)){
             $id = isset($dataJSON['client']['id']) ? $dataJSON['client']['id'] : $request->get('id');
@@ -111,12 +112,16 @@ class ClientController extends FOSRestController
                 $client->setCreationDate($now);
                 $client->setLoginCount(0);
                 $client->setGeneratedOffersCount(0);
+                $new = true;
             }
         }
         else{
             $client = new Client();
             $now = new \DateTime("now");
             $client->setCreationDate($now);
+            $client->setLoginCount(0);
+            $client->setGeneratedOffersCount(0);
+            $new = true;
         }
         if(!is_null($name)){
             $client->setName($name);
@@ -131,7 +136,7 @@ class ClientController extends FOSRestController
             'success' => 1,
             'client' => $this->prepareClientObject($client),
             'message' => array(
-                'client added successfully'
+                ($new ? 'client added successfully' : 'client updated successfully')
             )
         ] , 200);
     }

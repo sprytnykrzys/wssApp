@@ -32,7 +32,7 @@ class RegisterController extends FOSRestController
 
         $dataJSON = $this->getJSONRequest();
 
-        $uid = isset($dataJSON['uid']) ? $dataJSON['uid'] : $request->get('uid');
+        $uid = isset($dataJSON['user']['uid']) ? $dataJSON['user']['uid'] : $request->get('uid');
         if(!is_null($uid)){
             $user = $em->getRepository('AppBundle\Entity\User')->find($uid);
             if(is_object($user)){
@@ -40,10 +40,10 @@ class RegisterController extends FOSRestController
             }
         }
 
-        $email = isset($dataJSON['email']) ? $dataJSON['email'] : $request->get('email');
-        $password =  isset($dataJSON['password']) ? $dataJSON['password'] : $request->get('password');
-        $role =  isset($dataJSON['role']) ? $dataJSON['role'] : $request->get('role');
-        $id_client = isset($dataJSON['id_client']) ? $dataJSON['id_client'] : $request->get('id_client');
+        $email = isset($dataJSON['user']['email']) ? $dataJSON['user']['email'] : $request->get('email');
+        $password =  isset($dataJSON['user']['password']) ? $dataJSON['user']['password'] : $request->get('password');
+        $role =  isset($dataJSON['user']['role']) ? $dataJSON['user']['role'] : $request->get('role');
+        $id_client = isset($dataJSON['user']['id_client']) ? $dataJSON['user']['id_client'] : $request->get('id_client');
 
         if(isset($role)){
             $role = mb_convert_case($role,  MB_CASE_UPPER);
@@ -117,25 +117,11 @@ class RegisterController extends FOSRestController
 
         $dataJSON = $this->getJSONRequest();
 
-        $key = isset($dataJSON['key']) ? $dataJSON['key'] : $request->get('key');
-
-        if( !$key ||
-            (null != $key && $key != self::TOKEN) ||
-            $key != self::TOKEN
-        ){
-            return $this->fastResponse([
-                'hasErrors' => 1,
-                'errors' => array(
-                    'This service is not available'
-                )
-            ] , 400);
-        }
-
-        $email = isset($dataJSON['email']) ? $dataJSON['email'] : $request->get('email');
-        $password = isset($dataJSON['password']) ? $dataJSON['password'] : $request->get('password');
-        $role = isset($dataJSON['role']) ? $dataJSON['role'] : $request->get('role');
-        $discount = isset($dataJSON['discount']) ? $dataJSON['discount'] : $request->get('discount');
-        $id_client = isset($dataJSON['id_client']) ? $dataJSON['id_client'] : $request->get('id_client');
+        $email = isset($dataJSON['user']['email']) ? $dataJSON['user']['email'] : $request->get('email');
+        $password = isset($dataJSON['user']['password']) ? $dataJSON['user']['password'] : $request->get('password');
+        $role = isset($dataJSON['user']['role']) ? $dataJSON['user']['role'] : $request->get('role');
+        $discount = isset($dataJSON['user']['discount']) ? $dataJSON['user']['discount'] : $request->get('discount');
+        $id_client = isset($dataJSON['user']['id_client']) ? $dataJSON['user']['id_client'] : $request->get('id_client');
 
         if(!is_null($uid)){
             $em = $this->getDoctrine()->getManager();
@@ -158,7 +144,6 @@ class RegisterController extends FOSRestController
                     /* TODO: dodac walidacje czy klient istnieje */
                     $user->setIdClient($id_client);
                 }
-
 
                 $em->persist($user);
                 $em->flush();

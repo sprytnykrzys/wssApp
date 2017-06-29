@@ -148,27 +148,25 @@ class ProductSetController extends FOSRestController
             }
         }
 
-        if(!is_null($id_system)){
-            $product->setIdSystem($id_system);
-        }
-        else{
-            if(!$product->getIdSystem()){
-                $this->errorPush( 'id_system is required', 'id_system');
-            }
-        }
+//        if(!is_null($id_system)){
+//            $product->setIdSystem($id_system);
+//        }
+//        else{
+//            if(!$product->getIdSystem()){
+//                $this->errorPush( 'id_system is required', 'id_system');
+//            }
+//        }
 
-        if(!is_null($id_system)){
+        if(!is_null($id_system) && (int)$id_system){
             $system = $em->getRepository('AppBundle\Entity\Hierarchy')->find($id_system);
             if(is_object($system) && $system->getLevel() == 2){
                 $product->setHierarchy($system);
             }
             else{
-                $this->errorPush( 'System doesn\'t exist required', 'id_system');
+                $this->errorPush( 'System doesn\'t exist', 'id_system');
             }
         }
-        else{
-            $this->errorPush( 'System doesn\'t exist required', 'id_system');
-        }
+
 
         $coll = array();
         if(is_array($products)){
@@ -203,8 +201,8 @@ class ProductSetController extends FOSRestController
 
         return $this->fastResponse([
             'success' => 1,
-            'product' => $this->prepareProductsSetObjects($product),
-            'coll' => $coll,
+//            'product' => $this->prepareProductsSetObjects($product),
+//            'coll' => $coll,
             'message' => array(
                 $new ? 'products set added successfully' : 'products set updated successfully'
             )

@@ -8,7 +8,7 @@ use AppBundle\Entity\User;
 
 trait AppController
 {
-    protected $DEBUG = false;
+    protected $DEBUG = true;
     /*
      * Token lifetime in hours
      */
