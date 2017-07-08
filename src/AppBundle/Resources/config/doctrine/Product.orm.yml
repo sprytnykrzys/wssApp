@@ -44,7 +44,3 @@ AppBundle\Entity\Product:
             joinColumn:
                 name: hierarchy_id
                 referencedColumnName: id
-    manyToMany:
-        products_sets:
-            targetEntity: ProductsSet
-            mappedBy: products

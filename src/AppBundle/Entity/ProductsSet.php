@@ -29,6 +29,11 @@ class ProductsSet
     /**
      * @var string
      */
+    private $exportCode;
+
+    /**
+     * @var string
+     */
     private $image;
 
     /**
@@ -48,6 +53,16 @@ class ProductsSet
 
     private $hierarchy;
     private $products;
+
+    /**
+     * @var float
+     */
+    private $priceOfSet;
+
+    /**
+     * @var string
+     */
+    private $priceOfSetCurrency;
 
     public function __construct() {
         $this->products = new ArrayCollection();
@@ -85,6 +100,29 @@ class ProductsSet
     public function getNumber()
     {
         return $this->number;
+    }
+
+    /**
+     * Set exportCode
+     *
+     * @param string $exportCode
+     * @return ProductSet
+     */
+    public function setExportCode($exportCode)
+    {
+        $this->exportCode = $exportCode;
+
+        return $this;
+    }
+
+    /**
+     * Get exportCode
+     *
+     * @return string
+     */
+    public function getExportCode()
+    {
+        return $this->exportCode;
     }
 
     /**
@@ -210,21 +248,35 @@ class ProductsSet
     {
         return $this->products;
     }
-    public function getProductsIds(){
-        $ret = array();
-        $keys = $this->products->getKeys();
-        foreach ($keys as $key){
-            $ret[] = $this->products->get($key)->getId();
-        }
-        return $ret;
-    }
 
-    public function getProductsArray(){
+    /**
+     * @return array
+     */
+    public function getProductsExcludeSet()
+    {
         $ret = array();
         $keys = $this->products->getKeys();
         foreach ($keys as $key){
             $ret[] = $this->products->get($key)->prepareArray();
         }
+        return $ret;
+    }
+    public function getProductsIds(){
+        $ret = array();
+//        $keys = $this->products->getKeys();
+//        foreach ($keys as $key){
+//            $ret[] = $this->products->get($key)->getId();
+//        }
+        return $ret;
+    }
+
+    public function getProductsArray(){
+        $ret = array();
+
+//        $keys = $this->products->getKeys();
+//        foreach ($keys as $key){
+//            $ret[] = $this->products->get($key)->prepareArray();
+//        }
         return $ret;
     }
     /**
@@ -271,6 +323,18 @@ class ProductsSet
         return $this;
     }
 
+    private function calculateSetPrice(){
+        $this->priceOfSet = 0;
+        $keys = $this->products->getKeys();
+        foreach ($keys as $key){
+            $element = $this->products->get($key);
+            $price = $element->getProduct()->getPrice();
+            $quantity = $element->getQuantity();
+            $this->priceOfSet += $price * $quantity;
+            $this->priceOfSetCurrency = $element->getProduct()->getCurrency();
+        }
+        return $this->priceOfSet;
+    }
 
     public function prepareArray(){
         $ret = array(
@@ -278,9 +342,12 @@ class ProductsSet
             'name' => $this->getName(),
             'type' => $this->getType(),
             'code' => $this->getNumber(),
+            'export_code' => $this->getExportCode(),
             'id_system' => $this->getIdSystem(),
-            'products' => $this->getProductsArray(),
+            'products' => $this->getProductsExcludeSet(),
             'creation_date' => $this->getCreationDate(),
+            'set_price' => $this->calculateSetPrice(),
+            'set_price_currency' => $this->priceOfSetCurrency,
         );
         if(!is_null($this->image)){
             $base = Request::createFromGlobals()->getSchemeAndHttpHost();

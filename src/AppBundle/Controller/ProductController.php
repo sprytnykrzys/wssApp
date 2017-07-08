@@ -244,26 +244,54 @@ class ProductController extends FOSRestController
         if(!$this->isAdmin()){
             return $this->tooFewPrivilegesResponse();
         }
-        if(!is_null($product_id)){
-            $em = $this->getDoctrine()->getManager();
-            $product = $em->getRepository('AppBundle\Entity\Product')->find($product_id);
-            if(is_object($product)){
-                $em->remove( $product );
-                $em->flush();
+        if(is_null($product_id)){
+            $this->response['hasError'] = 1;
+            $this->response['message'] = 'Product ID is null';
+            return $this->fastResponse($this->response, 400);
+        }
+        $em = $this->getDoctrine()->getManager();
+        $product = $em->getRepository('AppBundle\Entity\Product')->find($product_id);
 
-                $this->response['success'] = 1;
-                $this->response['message'] = 'Product with ID = '. $product_id .' has been removed';
-                return $this->fastResponse($this->response, 200);
+        if(!is_object($product)){
+            $this->response['hasError'] = 1;
+            $this->response['message'] = 'Product with ID = '. $product_id .' doesn\'t exist';
+            return $this->fastResponse($this->response, 400);
+        }
+        if($existsConstraints = $this->checkConstraints($product, $em)){
+            return $existsConstraints;
+        }
+        $em->remove( $product );
+        $em->flush();
+
+        $this->response['success'] = 1;
+        $this->response['message'] = 'Product with ID = '. $product_id .' has been removed';
+        return $this->fastResponse($this->response, 200);
+
+
+    }
+
+    private function checkConstraints($product, $em){
+        $request = Request::createFromGlobals();
+        $dataJSON = $this->getJSONRequest();
+
+        $force = isset($dataJSON['force']) ? $dataJSON['force'] : $request->get('force');
+        $inSet = $em->getRepository('AppBundle\Entity\ProductInSet')->findBy(array(
+            'product' => $product->getId()
+        ));
+        if(empty($inSet)){
+            return false;
+        }
+        if($force){
+            foreach ($inSet as $singleInSet){
+                $em->remove( $singleInSet );
             }
-            else{
-                $this->response['hasError'] = 1;
-                $this->response['message'] = 'Product with ID = '. $product_id .' doesn\'t exist';
-                return $this->fastResponse($this->response, 400);
-            }
+            $em->flush();
+            return false;
         }
         $this->response['hasError'] = 1;
-        $this->response['message'] = 'Product ID is null';
+        $this->response['message'] = 'Product belongs to sets. If you want to remove product from all sets send request again with parameter force=1 parameter';
         return $this->fastResponse($this->response, 400);
+
     }
 
     /* Utilities */

@@ -58,11 +58,6 @@ class Product
 
 
     private $hierarchy;
-    private $products_sets;
-
-    public function __construct(){
-        $this->products_sets = new ArrayCollection();
-    }
 
     /**
      * Get id

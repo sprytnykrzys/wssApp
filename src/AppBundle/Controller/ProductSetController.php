@@ -9,10 +9,70 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
+use AppBundle\Entity\ProductInSet;
+
 
 class ProductSetController extends FOSRestController
 {
     use AppController;
+
+    /* CRUD common method for product in set management services */
+    public function manageProductInSet($id_product = null, $id_set = null, $quantity = null){
+        $em = $this->getDoctrine()->getManager();
+
+        if(is_null($quantity)){
+            $quantity = 1;
+        }
+        $quantity = (int)$quantity;
+        if(is_null($id_product) || is_null($id_set)){
+            return $this->fastResponse(array(
+                'errors' => 'id_product and id_set are required',
+            ));
+        }
+
+        $product = $em->getRepository('AppBundle\Entity\Product')->find($id_product);
+        $set = $em->getRepository('AppBundle\Entity\ProductsSet')->find($id_set);
+
+        if(!is_object($product) || !is_object($set)){
+            return $this->fastResponse(array(
+                'errors' => 'id_product or id_set doesn\'t exist',
+            ));
+        }
+
+        $productInSet = $em->getRepository('AppBundle\Entity\ProductInSet')->find(array(
+                'set' => $set->getId(),
+                'product' => $product->getId()
+            )
+        );
+
+        if(!is_object($productInSet)){
+            if($quantity > 0){
+                $productInSet = new ProductInSet($set, $product, $quantity);
+                $em->persist( $productInSet );
+            }
+            else{
+                return $this->fastResponse(array(
+                    'errors' => 'nothing changed - product is currently not associated with set',
+                ));
+            }
+        }
+        else{
+            $currentQuantity = (int)$productInSet->getQuantity();
+            if( ($currentQuantity + $quantity) > 0 ){
+                $productInSet->setQuantity( $currentQuantity + $quantity );
+            }
+            else{
+                $em->remove( $productInSet );
+            }
+        }
+
+        $em->flush();
+
+        return $this->fastResponse(array(
+            'success' => 1,
+            'product_in_set' => $productInSet
+        ));
+    }
 
     /**
      * @Route("/products_set")
@@ -39,6 +99,8 @@ class ProductSetController extends FOSRestController
     /**
      * @Route("/products_set/remove_product/")
      * @Method({"POST"})
+     *
+     * @deprecated
      */
     public function removeProductFromSetAction()
     {
@@ -72,14 +134,25 @@ class ProductSetController extends FOSRestController
         if(!is_object($product)){
             return $this->fastResponse(['message' => array('Product doesn\'t exist') ] , 400);
         }
-        $product_set->unsetProduct($product);
+        //$product_set->unsetProduct($product);
+        $productInSet = $em->getRepository('AppBundle\Entity\ProductInSet')->find(array(
+                'set' => $product_set->getId(),
+                'product' => $product->getId()
+            )
+        );
 
-//        $em->persist( $product_set );
-        $em->flush();
+        if(is_object($productInSet)){
 
-        return $this->fastResponse([
-            'message' => array('Successfully removed')
-        ] , 200);
+            $em->remove( $productInSet );
+            $em->flush();
+
+            return $this->fastResponse([
+                'message' => array('Successfully removed from set')
+            ] , 200);
+        }
+        return $this->fastResponse(array(
+            'errors' => 'nothing changed - product is currently not associated with set',
+        ));
     }
 
     /**
@@ -114,6 +187,7 @@ class ProductSetController extends FOSRestController
         }
 
         $name = isset($dataJSON['products_set']['name']) ? $dataJSON['products_set']['name'] : $request->get('name');
+        $export_code = isset($dataJSON['products_set']['export_code']) ? $dataJSON['products_set']['export_code'] : $request->get('export_code');
         $number = isset($dataJSON['products_set']['code']) ? $dataJSON['products_set']['code'] : $request->get('code');
         $type = isset($dataJSON['products_set']['type']) ? $dataJSON['products_set']['type'] : $request->get('type');
         $id_system = isset($dataJSON['products_set']['id_system']) ? $dataJSON['products_set']['id_system'] : $request->get('id_system');
@@ -138,6 +212,16 @@ class ProductSetController extends FOSRestController
                 $this->errorPush( 'Number is required', 'number');
             }
         }
+
+        if(!is_null($export_code)){
+            $product->setExportCode($export_code);
+        }
+//        else{
+//            if(!$product->getExportCode()){
+//                $this->errorPush( 'Export code is required', 'export_code');
+//            }
+//        }
+
 
         if(!is_null($type)){
             $product->setType($type);
@@ -167,14 +251,6 @@ class ProductSetController extends FOSRestController
             }
         }
 
-
-        $coll = array();
-        if(is_array($products)){
-            $coll = $em->getRepository('AppBundle\Entity\Product')->findByIds( $products );
-            $product->setProducts($coll);
-        }
-
-
         if($new){
             $dateNow = new \DateTime("now");
             $product->setCreationDate($dateNow);
@@ -188,6 +264,13 @@ class ProductSetController extends FOSRestController
 
         $em->persist( $product );
         $em->flush();
+
+        if(is_array($products)){
+            $coll = $em->getRepository('AppBundle\Entity\Product')->findByIds( $products );
+            foreach ($coll as $prod){
+                $this->manageProductInSet( $prod->getId(), $product->getId(), 1);
+            }
+        }
 
         if(!is_null($image)){
             $image = new FileManager( $pathToImages, $image );
@@ -209,6 +292,33 @@ class ProductSetController extends FOSRestController
         ] , 200);
     }
 
+    /**
+     * @Route("/products_set/{id_set}/product/{id_product}/{quantity}/")
+     * @Method({"POST"})
+     */
+    public function restAddProductToSetAction($id_set, $id_product, $quantity){
+        if( !$this->authenticate()){
+            return $this->prepareAuthRequiredResponse();
+        }
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
+        return $this->manageProductInSet($id_product, $id_set, $quantity);
+    }
+
+    /**
+     * @Route("/products_set/{id_set}/product/{id_product}/{quantity}/delete/")
+     * @Method({"POST"})
+     */
+    public function restSubstractProductFromSetAction($id_set, $id_product, $quantity){
+        if( !$this->authenticate()){
+            return $this->prepareAuthRequiredResponse();
+        }
+        if(!$this->isAdmin()){
+            return $this->tooFewPrivilegesResponse();
+        }
+        return $this->manageProductInSet($id_product, $id_set, -$quantity);
+    }
 
     /**
      * @Route("/products_set")
@@ -287,6 +397,11 @@ class ProductSetController extends FOSRestController
             $em = $this->getDoctrine()->getManager();
             $product = $em->getRepository('AppBundle\Entity\ProductsSet')->find($product_id);
             if(is_object($product)){
+
+                foreach($product->getProducts() as $productInSet){
+                    $this->manageProductInSet($productInSet->getProduct()->getId(), $product->getId(), -(int)$productInSet->getQuantity());
+                }
+                //return $this->fastResponse(array('set' => $product), 200);
                 $em->remove( $product );
                 $em->flush();
 

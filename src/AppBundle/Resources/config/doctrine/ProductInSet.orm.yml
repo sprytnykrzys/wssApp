@@ -1,0 +1,22 @@
+AppBundle\Entity\ProductInSet:
+    type: entity
+    table: product_in_set
+    repositoryClass: AppBundle\Repository\ProductInSetRepository
+    id:
+        product:
+            associationKey: true
+            column: id_product
+        set:
+            associationKey: true
+            column: id_product_set
+    fields:
+        quantity:
+            type: integer
+    manyToOne:
+        product:
+            targetEntity: Product
+        set:
+            targetEntity: ProductsSet
+            inversedBy: products
+
+    lifecycleCallbacks: {  }
