@@ -15,9 +15,14 @@ class Client
     private $id;
 
     /**
-     * @var string
+     * @var float
      */
     private $discount;
+
+    /**
+     * @var string
+     */
+    private $discountCurrency;
 
     /**
      * @var \DateTime
@@ -53,7 +58,7 @@ class Client
     /**
      * Set discount
      *
-     * @param string $discount
+     * @param float $discount
      * @return Client
      */
     public function setDiscount($discount)
@@ -66,11 +71,30 @@ class Client
     /**
      * Get discount
      *
-     * @return string 
+     * @return float
      */
     public function getDiscount()
     {
         return $this->discount;
+    }
+
+    /**
+     * @param string $discountCurrency
+     * @return Client
+     */
+    public function setDiscountCurrency($discountCurrency)
+    {
+        $this->discountCurrency = $discountCurrency;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDiscountCurrency()
+    {
+        return $this->discountCurrency;
     }
 
     /**

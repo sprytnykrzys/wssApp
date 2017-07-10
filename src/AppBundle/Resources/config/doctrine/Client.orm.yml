@@ -10,9 +10,12 @@ AppBundle\Entity\Client:
                 strategy: AUTO
     fields:
         discount:
-            type: text
-            length: '32'
+            type: float
             nullable: true
+        discountCurrency:
+            column: discount_currency
+            type: text
+            length: '16'
         creationDate:
             type: datetime
         name:

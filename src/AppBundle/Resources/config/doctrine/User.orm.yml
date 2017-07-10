@@ -19,10 +19,6 @@ AppBundle\Entity\User:
         role:
             type: string
             length: '32'
-        discount:
-            type: text
-            length: '32'
-            nullable: true
         password:
             type: string
             length: '128'

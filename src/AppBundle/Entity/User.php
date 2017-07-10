@@ -30,11 +30,6 @@ class User
     /**
      * @var string
      */
-    private $discount;
-
-    /**
-     * @var string
-     */
     private $password;
 
     /**
@@ -142,28 +137,28 @@ class User
         return $this->role;
     }
 
-    /**
-     * Set discount
-     *
-     * @param string $discount
-     * @return User
-     */
-    public function setDiscount($discount)
-    {
-        $this->discount = base64_encode($discount);
-
-        return $this;
-    }
-
-    /**
-     * Get discount
-     *
-     * @return string 
-     */
-    public function getDiscount()
-    {
-        return base64_decode($this->discount);
-    }
+//    /**
+//     * Set discount
+//     *
+//     * @param string $discount
+//     * @return User
+//     */
+//    public function setDiscount($discount)
+//    {
+//        $this->discount = base64_encode($discount);
+//
+//        return $this;
+//    }
+//
+//    /**
+//     * Get discount
+//     *
+//     * @return string
+//     */
+//    public function getDiscount()
+//    {
+//        return base64_decode($this->discount);
+//    }
 
     /**
      * Set password
@@ -320,7 +315,6 @@ class User
             'email' => $this->getEmail(),
             'id_client' => $this->getIdClient(),
             'role' => $this->getRole(),
-            'discount' => $this->getDiscount(),
             'last_login' => $this->getLastLogin(),
             'creation_date' => $this->getCreationDate(),
         );

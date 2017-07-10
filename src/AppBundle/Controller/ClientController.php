@@ -91,6 +91,7 @@ class ClientController extends FOSRestController
         if(!$this->isAdmin()){
             return $this->tooFewPrivilegesResponse();
         }
+        $errors = [];
         $request = Request::createFromGlobals();
 
         $dataJSON = $this->getJSONRequest();
@@ -103,6 +104,7 @@ class ClientController extends FOSRestController
         }
         $name = isset($dataJSON['client']['name']) ? $dataJSON['client']['name'] : null;
         $discount = isset($dataJSON['client']['discount']) ? $dataJSON['client']['discount'] : null;
+        $discountCurrency = isset($dataJSON['client']['discount_currency']) ? $dataJSON['client']['discount_currency'] : null;
 
         if(!is_null($id)){
             $client = $em->getRepository('AppBundle\Entity\Client')->find($id);
@@ -127,8 +129,23 @@ class ClientController extends FOSRestController
             $client->setName($name);
         }
         if(!is_null($discount)){
-            $client->setDiscount($discount);
+            if(!is_numeric($discount)){
+                $errors[] = 'discount must be numeric';
+            }
+            else{
+                $client->setDiscount($discount);
+            }
         }
+        if(!is_null($discountCurrency)){
+            $client->setDiscountCurrency($discountCurrency);
+        }
+
+        if(!empty($errors)){
+            return $this->fastResponse([
+                'errors' => $errors
+            ] , 200);
+        }
+
         $em->persist( $client );
         $em->flush();
 

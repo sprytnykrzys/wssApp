@@ -61,7 +61,7 @@ class RegisterController extends FOSRestController
             $user->setEmail($email);
 
             $user->setRole($role);
-            $user->setDiscount('0 zł');
+            //$user->setDiscount('0 zł');
 
             $now = new \DateTime("now");
             $exp = $now->add( new \DateInterval("PT1H") );
@@ -137,9 +137,9 @@ class RegisterController extends FOSRestController
                 if(!is_null($role)){
                     $user->setRole($role);
                 }
-                if(!is_null($discount)){
-                    $user->setDiscount($discount);
-                }
+//                if(!is_null($discount)){
+//                    $user->setDiscount($discount);
+//                }
                 if(!is_null($id_client)){
                     /* TODO: dodac walidacje czy klient istnieje */
                     $user->setIdClient($id_client);
@@ -283,15 +283,28 @@ class RegisterController extends FOSRestController
     }
     private function prepareUserObject($obj){
         if(is_object($obj)){
-            return array(
+            $em = $this->getDoctrine()->getManager();
+
+            $ret = array(
                 'uid' => $obj->getId(),
                 'email' => $obj->getEmail(),
                 'id_client' => $obj->getIdClient(),
                 'role' => $obj->getRole(),
-                'discount' => $obj->getDiscount(),
+                /* BACKEND: trzeba dorobic pobieranie tych pol na podstawie klienta */
                 'last_login' => $obj->getLastLogin(),
                 'creation_date' => $obj->getCreationDate(),
             );
+            if($obj->getIdClient()){
+                $client = $em->getRepository('AppBundle\Entity\Client')->find($obj->getIdClient());
+                if(is_object($client)){
+                    $ret['discount'] = $client->getDiscount();
+                    $ret['discount_currency'] = $client->getDiscountCurrency();
+                    return $ret;
+                }
+            }
+            $ret['discount'] = 0;
+            $ret['discount_currency'] = '';
+            return $ret;
         }
         else{
             return array();
